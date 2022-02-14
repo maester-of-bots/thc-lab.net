@@ -1,7 +1,6 @@
 from flask import render_template, request, redirect
 from app import app
 from passBuddy import *
-from badape import *
 from BOFH import *
 
 @app.route('/', methods=['GET', 'POST'])
@@ -33,6 +32,7 @@ def passbuddy():
     plaintext = plaintexts[1].capitalize()  +" "+ plaintexts[0].capitalize()
     return render_template('pass.html', big_title="Skeeve's Awesome Password Generator", small_title='Password Buddy',password=password, plaintext=plaintext, kid_count=kid_count, teen_count=teen_count ,adult_count=adult_count, swear_count=swear_count, xxx_count=xxx_count)
 
+"""
 @app.route('/badape.html', methods=['GET', 'POST'])
 def badape():
     meltdownScore=""
@@ -42,7 +42,7 @@ def badape():
         data = request.form.to_dict()
         meltdownScore, meltPosts, meltComments = meltdownCalc(data['Name'])
     return render_template('badape.html', title='ShillScore', response=meltdownScore, meltPosts=meltPosts,meltComments=meltComments)
-
+"""
 
 @app.route('/wordlist.html')
 def wordlists():
