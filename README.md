@@ -2,6 +2,14 @@
 
 # Version History
 
+## 1.5
+
+Added YuGiOh searcher, cleaned things up.  Re-deployed.
+
+## 1.4
+
+Added BadApe
+
 ## 1.3
 
 Trimmed many words from the "Working Adult" section, both potentially offensive and too long for a reasonable person's password
