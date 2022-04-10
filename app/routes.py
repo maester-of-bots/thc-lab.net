@@ -3,6 +3,10 @@ from app import app
 from passBuddy import *
 from BOFH import *
 from badape import *
+from yugioh import *
+
+# Init Yugioh cards
+cards = getAllCards()
 
 # Main page, there's nothing here...
 @app.route('/', methods=['GET', 'POST'])
@@ -14,6 +18,19 @@ def index():
 @app.route('/captain.html')
 def captain():
     return render_template('captain.html', title='BITCHES AND HOES')
+
+
+# Bad Ape
+@app.route('/yugioh.html', methods=['GET', 'POST'])
+def yugioh():
+    if request.method == 'POST':
+        result = request.form.to_dict()['id']
+        for card in cards:
+            if card.id == int(result):
+                data = card.getInfo()
+                return render_template('yugioh.html', title='YuGiOh Card Searcher', response=data)
+    else:
+        return render_template('yugioh.html', title='YuGiOh Card Searcher')
 
 
 # BOFH Simulator

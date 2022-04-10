@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% endblock %}
+{% block content2 %}
+
+<form action="/yugioh.html" method = "POST">
+		<p>Card ID / Password: <input type = "text" name = "id" /></p>
+		<p><input type = "submit" value = "Submit"/></p>
+	</form>
+{% autoescape false %}
+    <h1><font size="10">{{ response }}</font></h1><br/><br/><br/>
+{% endautoescape %}
+    <br>
+    <br/>
+    <br/>
+{% endblock %}
