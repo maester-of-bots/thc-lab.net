@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
-<form method="POST", action="/">
+<br/><br/>
+<form method="POST", action="/pass.html">
 		<button class="button" name="kids" type="submit" style="vertical-align:middle"><span>For Kids</span><span STYLE="font-size: 10pt"><br/>({{kid_count}} possible passwords!)</span></button><span></span><br/>
 		<button class="button" name="teens" type="submit" style="vertical-align:middle"><span>For Teens</span><span STYLE="font-size: 10pt"><br/>({{teen_count}} possible passwords!)</span></button><br/>
 		<button class="button" name="adults" type="submit" style="vertical-align:middle"><span>For Work</span><span STYLE="font-size: 10pt"><br/>({{adult_count}} possible passwords!)</span></button><br/>
