@@ -1,24 +1,27 @@
 from flask import render_template, request, redirect, send_file, url_for, flash
 from app import app, db
-from passBuddy import *
-from BOFH import *
-from badape import *
-from yugioh import *
+from modules.passBuddy import *
+from modules.BOFH import *
+from modules.badape import *
+from modules.yugioh import *
+from modules.skyrim import *
+import sqlite3
 
-from datetime import datetime
-from app.models import ShortUrls
-from random import choice
-import string
+from hashids import Hashids
+
 
 
 # Init Yugioh cards
 cards = getAllCards()
 
 
-def generate_short_id(num_of_chars: int):
-    """Function to generate short_id of specified number of characters"""
-    return ''.join(choice(string.ascii_letters+string.digits) for _ in range(num_of_chars))
+def get_db_connection():
+    conn = sqlite3.connect('data/database.db')
+    conn.row_factory = sqlite3.Row
+    return conn
 
+
+hashids = Hashids(min_length=4, salt=app.config['SECRET_KEY'])
 
 
 # Main page, there's nothing here...
@@ -92,41 +95,56 @@ def projects():
 def sitemap():
     return send_file('sitemap.xml')
 
-@app.route('/shorty', methods=['GET', 'POST'])
-def reroute():
+
+@app.route('/shorts', methods=('GET', 'POST'))
+def shorts():
+    conn = get_db_connection()
+
     if request.method == 'POST':
         url = request.form['url']
-        short_id = request.form['custom_id']
-
-        if short_id and ShortUrls.query.filter_by(short_id=short_id).first() is not None:
-            flash('Please enter different custom id!')
-            return redirect(url_for('index_short'))
 
         if not url:
             flash('The URL is required!')
-            return redirect(url_for('index_short'))
+            return redirect(url_for('index'))
 
-        if not short_id:
-            short_id = generate_short_id(8)
+        url_data = conn.execute('INSERT INTO urls (original_url) VALUES (?)',
+                                (url,))
+        conn.commit()
+        conn.close()
 
-        new_link = ShortUrls(
-            original_url=url, short_id=short_id, created_at=datetime.now())
-        db.session.add(new_link)
-        db.session.commit()
-        short_url = request.host_url + short_id
+        url_id = url_data.lastrowid
+        hashid = hashids.encode(url_id)
+        short_url = request.host_url + hashid
 
-        return render_template('index_short.html', short_url=short_url)
+        return render_template('shorts_index.html', short_url=short_url)
 
-    return render_template('index_short.html')
+    return render_template('shorts_index.html')
 
-@app.route('/<short_id>')
-def redirect_url(short_id):
-    link = ShortUrls.query.filter_by(short_id=short_id).first()
-    if link:
-        return redirect(link.original_url)
+
+@app.route('/<id>')
+def url_redirect(id):
+    conn = get_db_connection()
+
+    original_id = hashids.decode(id)
+    if original_id:
+        original_id = original_id[0]
+        url_data = conn.execute('SELECT original_url, clicks FROM urls'
+                                ' WHERE id = (?)', (original_id,)
+                                ).fetchone()
+        original_url = url_data['original_url']
+        clicks = url_data['clicks']
+
+        conn.execute('UPDATE urls SET clicks = ? WHERE id = ?',
+                     (clicks+1, original_id))
+
+        conn.commit()
+        conn.close()
+        return redirect(original_url)
     else:
         flash('Invalid URL')
         return redirect(url_for('index'))
+
+
 
 # Error Handling
 @app.errorhandler(404)
