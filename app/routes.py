@@ -38,7 +38,7 @@ def index():
 # Captain website
 @app.route('/captain.html')
 def captain():
-    return render_template('captain.html', small_title="BITCHES AND HOES", description="Captain Memorial Website",image_url="https://i0.wp.com/powdermonkey.blog/wp-content/uploads/2021/07/powder-monkey-logo-1a.jpg")
+    return render_template('captain.html', small_title="BITCHES AND HOES", description="Captain Memorial Website",image_url="pm.png")
 
 
 # Bad Ape
