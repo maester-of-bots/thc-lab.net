@@ -10,6 +10,11 @@ import sqlite3
 from hashids import Hashids
 
 
+'''
+small_title="Title", description="Description",image_url="image.jpg", 
+description
+image_url
+		'''
 
 # Init Yugioh cards
 cards = getAllCards()
@@ -27,13 +32,13 @@ hashids = Hashids(min_length=4, salt=app.config['SECRET_KEY'])
 # Main page, there's nothing here...
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    return render_template('index.html',  content_data="Steve's Random Python Website",big_title="Steve's Random Python Website", small_title='Home Page')
+    return render_template('index.html',  small_title="Steve's Random Python Website",big_title="Steve's Random Python Website", description="Description",image_url="image.jpg")
 
 
 # Captain website
 @app.route('/captain.html')
 def captain():
-    return render_template('captain.html', content_data="BITCHES AND HOES", title='BITCHES AND HOES')
+    return render_template('captain.html', small_title="BITCHES AND HOES", description="Captain Memorial Website",image_url="https://i0.wp.com/powdermonkey.blog/wp-content/uploads/2021/07/powder-monkey-logo-1a.jpg")
 
 
 # Bad Ape
@@ -44,9 +49,9 @@ def yugioh():
         for card in cards:
             if card.id == int(result):
                 data = card.getInfo()
-                return render_template('yugioh.html', title='YuGiOh Card Searcher', response=data)
+                return render_template('yugioh.html', small_title='YuGiOh Card Searcher', response=data)
     else:
-        return render_template('yugioh.html', content_data="YuGiOh Card Searcher", title='YuGiOh Card Searcher')
+        return render_template('yugioh.html', small_title="YuGiOh Card Searcher", title='YuGiOh Card Searcher', description="Description",image_url="image.jpg")
 
 
 # BOFH Simulator
@@ -56,7 +61,7 @@ def bofh():
     response=bofh_text[x].capitalize()
     lmgtfy="https://www.google.com/search?q=" + response.replace(" ","+")
 
-    return render_template('bofh.html', content_data="IT Help Desk", title='IT Help Desk', response=response, link=lmgtfy)
+    return render_template('bofh.html', small_title='IT Help Desk', response=response, link=lmgtfy, description="Description",image_url="image.jpg")
 
 
 # Password generator
@@ -71,7 +76,7 @@ def passbuddy():
     password = passwords[1] + passwords[0] + getSpecial()
     password = ''.join(addCap(password))
     plaintext = plaintexts[1].capitalize()  +" "+ plaintexts[0].capitalize()
-    return render_template('pass.html', big_title="Steve's Awesome Password Generator", small_title='Password Buddy',password=password, plaintext=plaintext, kid_count=kid_count, teen_count=teen_count ,adult_count=adult_count, swear_count=swear_count, xxx_count=xxx_count)
+    return render_template('pass.html', small_title="Steve's Awesome Password Generator", description="Description",image_url="image.jpg", password=password, plaintext=plaintext, kid_count=kid_count, teen_count=teen_count ,adult_count=adult_count, swear_count=swear_count, xxx_count=xxx_count)
 
 
 # Bad Ape
@@ -83,13 +88,13 @@ def badape():
     if request.method == 'POST':
         data = request.form.to_dict()
         meltdownScore, meltPosts, meltComments = meltdownCalc(data['Name'])
-    return render_template('badape.html', title='ShillScore', content_data="BadApe ShillSniffer", response=meltdownScore, meltPosts=meltPosts,meltComments=meltComments)
+    return render_template('badape.html', small_title='ShillScore Calculator', description="Description",image_url="image.jpg", response=meltdownScore, meltPosts=meltPosts,meltComments=meltComments)
 
 
 # Shows various things I've worked on
 @app.route('/projects.html')
 def projects():
-    return render_template('projects.html', title='Projects')
+    return render_template('projects.html', small_title='Projects', description="Description",image_url="image.jpg")
 
 @app.route('/sitemap.xml')
 def sitemap():
@@ -116,9 +121,9 @@ def shorts():
         hashid = hashids.encode(url_id)
         short_url = request.host_url + hashid
 
-        return render_template('shorts.html', content_data="URL Shortener", short_url=short_url)
+        return render_template('shorts.html', small_title="URL Shortener", short_url=short_url, description="Description",image_url="image.jpg")
 
-    return render_template('shorts.html', content_data="URL Shortener")
+    return render_template('shorts.html', small_title="URL Shortener", description="Description",image_url="image.jpg")
 
 
 @app.route('/<id>')
