@@ -105,7 +105,7 @@ def shorts():
 
         if not url:
             flash('The URL is required!')
-            return redirect(url_for('index'))
+            return redirect(url_for('shorts'))
 
         url_data = conn.execute('INSERT INTO urls (original_url) VALUES (?)',
                                 (url,))
@@ -116,9 +116,9 @@ def shorts():
         hashid = hashids.encode(url_id)
         short_url = request.host_url + hashid
 
-        return render_template('shorts_index.html', content_data="URL Shortener", short_url=short_url)
+        return render_template('shorts.html', content_data="URL Shortener", short_url=short_url)
 
-    return render_template('shorts_index.html', content_data="URL Shortener")
+    return render_template('shorts.html', content_data="URL Shortener")
 
 
 @app.route('/<id>')
