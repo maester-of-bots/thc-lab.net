@@ -27,13 +27,13 @@ hashids = Hashids(min_length=4, salt=app.config['SECRET_KEY'])
 # Main page, there's nothing here...
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    return render_template('index.html', big_title="Steve's Random Python Website", small_title='Home Page')
+    return render_template('index.html',  content_data="Steve's Random Python Website",big_title="Steve's Random Python Website", small_title='Home Page')
 
 
 # Captain website
 @app.route('/captain.html')
 def captain():
-    return render_template('captain.html', title='BITCHES AND HOES')
+    return render_template('captain.html', content_data="BITCHES AND HOES", title='BITCHES AND HOES')
 
 
 # Bad Ape
@@ -46,7 +46,7 @@ def yugioh():
                 data = card.getInfo()
                 return render_template('yugioh.html', title='YuGiOh Card Searcher', response=data)
     else:
-        return render_template('yugioh.html', title='YuGiOh Card Searcher')
+        return render_template('yugioh.html', content_data="YuGiOh Card Searcher", title='YuGiOh Card Searcher')
 
 
 # BOFH Simulator
@@ -56,7 +56,7 @@ def bofh():
     response=bofh_text[x].capitalize()
     lmgtfy="https://www.google.com/search?q=" + response.replace(" ","+")
 
-    return render_template('bofh.html', title='IT Help Desk', response=response, link=lmgtfy)
+    return render_template('bofh.html', content_data="IT Help Desk", title='IT Help Desk', response=response, link=lmgtfy)
 
 
 # Password generator
@@ -83,7 +83,7 @@ def badape():
     if request.method == 'POST':
         data = request.form.to_dict()
         meltdownScore, meltPosts, meltComments = meltdownCalc(data['Name'])
-    return render_template('badape.html', title='ShillScore', response=meltdownScore, meltPosts=meltPosts,meltComments=meltComments)
+    return render_template('badape.html', title='ShillScore', content_data="BadApe ShillSniffer", response=meltdownScore, meltPosts=meltPosts,meltComments=meltComments)
 
 
 # Shows various things I've worked on
@@ -116,9 +116,9 @@ def shorts():
         hashid = hashids.encode(url_id)
         short_url = request.host_url + hashid
 
-        return render_template('shorts_index.html', short_url=short_url)
+        return render_template('shorts_index.html', content_data="URL Shortener", short_url=short_url)
 
-    return render_template('shorts_index.html')
+    return render_template('shorts_index.html', content_data="URL Shortener")
 
 
 @app.route('/<id>')
