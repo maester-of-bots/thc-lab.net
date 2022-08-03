@@ -88,6 +88,8 @@ def badape():
     if request.method == 'POST':
         data = request.form.to_dict()
         meltdownScore, meltPosts, meltComments = meltdownCalc(data['Name'])
+
+    print(meltdownScore, meltPosts, meltComments)
     return render_template('badape.html', small_title='ShillScore Calculator', description="Description",image_url="image.jpg", response=meltdownScore, meltPosts=meltPosts,meltComments=meltComments)
 
 
