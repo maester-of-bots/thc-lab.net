@@ -5,7 +5,7 @@ from operator import itemgetter
 reddit = praw.Reddit(
     client_id="XqD230Drxu9LKg",
     client_secret="-r4w9UetfIuPRuq8Uji3WGCIW7Ju9g",
-    password="61ndy!TqEgfyTf",
+    password="Nipple$alads45)",
     user_agent="Bad Ape 1.0",
     username="BadApe-Bot",
 )
