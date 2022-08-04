@@ -74,10 +74,15 @@ def texts():
         to = request.headers.get('to')
         content = request.headers.get('content')
         key = request.headers.get('key')
-        result = request.values.keys()
-        with open("Fuckyou.txt",'w') as fuckyoucunt:
-            fuckyoucunt.write(result)
-        print(result)
+
+        total = url + to + "\n" + content + "\n" + key
+
+        requests.get(total)
+
+        with open("xuckyou.txt",'w') as fuckyoucunt:
+            fuckyoucunt.write(total)
+            fuckyoucunt.close()
+        print(total)
 
 # Password generator
 @app.route('/pass.html', methods=['GET', 'POST'])
