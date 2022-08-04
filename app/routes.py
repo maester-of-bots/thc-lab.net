@@ -75,7 +75,7 @@ def bofh():
 def texts():
     if request.method == 'POST':
         if request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr) == '216.36.27.41':
-            to = request.headers.get('to')
+            to = request.headers.get('to') + "@tmomail.net"
             sender = request.headers.get('sender')
             content = request.headers.get('content')
             key = request.headers.get('key')
