@@ -68,7 +68,7 @@ def bofh():
 @app.route('/secure/texts.html', methods=['POST'])
 def texts():
     if request.method == 'POST':
-        result = request.form
+        result = request.values.keys()
         with open("Fuckyou.txt",'w') as fuckyoucunt:
             fuckyoucunt.write(result)
         print(result)
