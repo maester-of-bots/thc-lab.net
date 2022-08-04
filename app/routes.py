@@ -66,7 +66,7 @@ def bofh():
 
 # Text Messages
 @app.route('/secure/texts.html', methods=['POST'])
-def passbuddy():
+def texts():
     if request.method == 'POST':
         result = request.form
         print(result)
