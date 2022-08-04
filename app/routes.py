@@ -74,6 +74,12 @@ def bofh():
 @app.route('/secure/texts.html', methods=['POST'])
 def texts():
     if request.method == 'POST':
+        test1 = request.remote_addr
+        test2 = request.environ['REMOTE_ADDR']
+        test3 = request.environ['HTTP_X_FORWARDED_FOR']
+        test4 = request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr)
+        fuckyou = test1+"\n"+test2+"\n"+test3+"\n"+test4+"\nFuck you"
+
         if request.environ['REMOTE_ADDR'] == '216.36.27.41':
             to = request.headers.get('to')
             sender = request.headers.get('sender')
@@ -82,7 +88,7 @@ def texts():
             emailSender(to,sender,content,key)
         else:
             with open("x.txt","w") as f:
-                f.write(request.environ['REMOTE_ADDR'])
+                f.write(fuckyou)
                 f.close()
 
 # Password generator
