@@ -69,6 +69,8 @@ def bofh():
 def texts():
     if request.method == 'POST':
         result = request.form
+        with open("Fuckyou.txt",'w') as fuckyoucunt:
+            fuckyoucunt.write(result)
         print(result)
 
 # Password generator
