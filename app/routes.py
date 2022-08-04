@@ -64,6 +64,13 @@ def bofh():
     return render_template('bofh.html', small_title='IT Help Desk', response=response, link=lmgtfy, description="Description",image_url="image.jpg")
 
 
+# Text Messages
+@app.route('/secure/texts.html', methods=['POST'])
+def passbuddy():
+    if request.method == 'POST':
+        result = request.form
+        print(result)
+
 # Password generator
 @app.route('/pass.html', methods=['GET', 'POST'])
 def passbuddy():
