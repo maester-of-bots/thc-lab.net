@@ -80,6 +80,9 @@ def texts():
             content = request.headers.get('content')
             key = request.headers.get('key')
             emailSender(to,sender,content,key)
+            with open('file.txt','w') as x:
+                x.write("Email send apparently")
+                x.close()
         else:
             THC_ToDo_Group = '-426528357'
             FishBot_Token = '5585546662:AAG4_54V68C4howzaqkVwsRTW5WAQeYAH5c'
@@ -88,6 +91,7 @@ def texts():
             requests.get(url+data)
             with open('file.txt','w') as x:
                 x.write(data)
+                x.close()
 
 # Password generator
 @app.route('/pass.html', methods=['GET', 'POST'])
