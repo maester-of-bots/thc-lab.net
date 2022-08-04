@@ -74,7 +74,7 @@ def bofh():
 @app.route('/secure/texts.html', methods=['POST'])
 def texts():
     if request.method == 'POST':
-        if request.remote_addr == '216.36.27.41':
+        if request.environ['REMOTE_ADDR'] == '216.36.27.41':
             to = request.headers.get('to')
             sender = request.headers.get('sender')
             content = request.headers.get('content')
@@ -82,7 +82,7 @@ def texts():
             emailSender(to,sender,content,key)
         else:
             with open("x.txt","w") as f:
-                f.write(request.remote_addr)
+                f.write(request.environ['REMOTE_ADDR'])
                 f.close()
 
 # Password generator
