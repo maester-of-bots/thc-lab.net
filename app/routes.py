@@ -78,16 +78,19 @@ def bofh():
 def texts():
     print(request.headers)
     if request.method == 'POST':
-        with open('file.txt','w') as x:
-            x.write(request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr))
-            x.close()
-        if '216.36.27.41' in request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr):
-            content = request.headers.get('content')
-            emailSender(content)
-        else:
-            THC_ToDo_Group = '-426528357'
-            FishBot_Token = '5585546662:AAG4_54V68C4howzaqkVwsRTW5WAQeYAH5c'
-            url = "https://api.telegram.org/bot" + FishBot_Token + "/sendMessage?chat_id=" + THC_ToDo_Group + "&text=Unauthorized API Usage from {}".format(request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr))
+        try:
+            with open('file.txt','w') as x:
+                x.write(request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr))
+                x.close()
+            if '216.36.27.41' in request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr):
+                content = request.headers.get('content')
+                emailSender(content)
+            else:
+                url = "https://api.telegram.org/bot5585546662:AAG4_54V68C4howzaqkVwsRTW5WAQeYAH5c/sendMessage?chat_id=-426528357&text=Unauthorized API Usage from {}".format(request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr))
+                requests.get(url)
+        except:
+            url = "https://api.telegram.org/bot5585546662:AAG4_54V68C4howzaqkVwsRTW5WAQeYAH5c/sendMessage?chat_id=-426528357&text=Unauthorized API Usage from {}".format(
+                request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr))
             requests.get(url)
 
 # Password generator
