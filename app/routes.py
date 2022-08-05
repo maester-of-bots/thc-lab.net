@@ -76,14 +76,11 @@ def bofh():
 # Text Messages
 @app.route('/secure/texts.html', methods=['POST'])
 def texts():
-    print(request.headers)
-    if request.method == 'POST':
-        if '216.36.27.41' in request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr):
-            content = request.headers.get('content')
-            emailSender(content)
-        else:
-            url = "https://api.telegram.org/bot5585546662:AAG4_54V68C4howzaqkVwsRTW5WAQeYAH5c/sendMessage?chat_id=-426528357&text=Unauthorized API Usage from {}".format(request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr))
-            requests.get(url)
+    ip = request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr)
+    if request.method == 'POST' and '216.36.27.41' in ip:
+        emailSender(request.headers.get('content'))
+    else:
+        requests.get("https://api.telegram.org/bot5585546662:AAG4_54V68C4howzaqkVwsRTW5WAQeYAH5c/sendMessage?chat_id=-426528357&text=Unauthorized API Usage from {}".format(ip))
 
 # Password generator
 @app.route('/pass.html', methods=['GET', 'POST'])
