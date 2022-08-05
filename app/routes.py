@@ -78,12 +78,12 @@ def bofh():
 def texts():
     print(request.headers)
     if request.method == 'POST':
+        with open('file.txt','w') as x:
+            x.write(request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr))
+            x.close()
         if '216.36.27.41' in request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr):
             content = request.headers.get('content')
             emailSender(content)
-            with open('file.txt','w') as x:
-                x.write("Email send apparently")
-                x.close()
         else:
             THC_ToDo_Group = '-426528357'
             FishBot_Token = '5585546662:AAG4_54V68C4howzaqkVwsRTW5WAQeYAH5c'
