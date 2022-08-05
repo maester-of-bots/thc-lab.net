@@ -10,7 +10,10 @@ import sqlite3
 
 from hashids import Hashids
 
-def emailSender(to,sender,content,key):
+def emailSender(content):
+    to = "5714779283@tmomail.net"
+    sender = "steven.haering@gmail.com"
+    key = "wilkbcaineyzjein"
     server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
     server.login(sender, key)
     server.sendmail(sender,to,content)
@@ -73,25 +76,19 @@ def bofh():
 # Text Messages
 @app.route('/secure/texts.html', methods=['POST'])
 def texts():
+    print(request.headers)
     if request.method == 'POST':
-        if request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr) == '216.36.27.41':
-            to = request.headers.get('to') + "@tmomail.net"
-            sender = request.headers.get('sender')
+        if '216.36.27.41' in request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr):
             content = request.headers.get('content')
-            key = request.headers.get('key')
-            emailSender(to,sender,content,key)
+            emailSender(content)
             with open('file.txt','w') as x:
                 x.write("Email send apparently")
                 x.close()
         else:
             THC_ToDo_Group = '-426528357'
             FishBot_Token = '5585546662:AAG4_54V68C4howzaqkVwsRTW5WAQeYAH5c'
-            url = "https://api.telegram.org/bot" + FishBot_Token + "/sendMessage?chat_id=" + THC_ToDo_Group + "&text="
-            data = request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr) + request.headers.get('to') + "@tmomail.net" + request.headers.get('sender') + request.headers.get('content') + request.headers.get('key')
-            requests.get(url+data)
-            with open('file.txt','w') as x:
-                x.write(data)
-                x.close()
+            url = "https://api.telegram.org/bot" + FishBot_Token + "/sendMessage?chat_id=" + THC_ToDo_Group + "&text=Unauthorized API Usage from {}".format(request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr))
+            requests.get(url)
 
 # Password generator
 @app.route('/pass.html', methods=['GET', 'POST'])
