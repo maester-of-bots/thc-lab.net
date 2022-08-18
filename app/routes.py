@@ -172,6 +172,10 @@ def url_redirect(id):
 
 
 
+@app.route('/404.html')
+def x404():
+    return render_template('404.html')
+
 # Error Handling
 @app.errorhandler(404)
 def hahafuckyou_1(e):
