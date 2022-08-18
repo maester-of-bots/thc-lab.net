@@ -167,7 +167,8 @@ def url_redirect(id):
         return redirect(original_url)
     else:
         flash('Invalid URL')
-        return redirect(url_for('index'))
+        return render_template('404.html')
+        # return redirect(url_for('index'))
 
 
 
