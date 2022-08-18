@@ -184,11 +184,11 @@ def x404():
 
 
 @app.route('/400.html')
-def x404():
+def x400():
     return render_template('400.html')
 
 @app.route('/666.html')
-def x404():
+def x666():
     return render_template('666.html')
 
 @app.route('/recs.html')
