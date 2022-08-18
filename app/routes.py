@@ -175,7 +175,8 @@ def url_redirect(id):
 @app.errorhandler(404)
 def hahafuckyou_1(e):
     # note that we set the 404 status explicitly
-    return redirect("http://thc-lab.net:8080", code=302)
+    return render_template('404.html')
+    # return redirect("http://thc-lab.net:8080", code=302)
 
 
 @app.errorhandler(400)
