@@ -146,6 +146,23 @@ def shorts():
     return render_template('shorts.html', small_title="URL Shortener", description="Description",image_url="image.jpg")
 
 
+@app.route('/404.html')
+def x404():
+    return render_template('404.html')
+
+
+@app.route('/400.html')
+def x400():
+    return render_template('400.html')
+
+@app.route('/666.html')
+def x666():
+    return render_template('666.html')
+
+@app.route('/recs.html')
+def recs():
+    return render_template('recs.html')
+
 @app.route('/<id>')
 def url_redirect(id):
     conn = get_db_connection()
@@ -178,22 +195,6 @@ def url_redirect(id):
 
 
 
-@app.route('/404.html')
-def x404():
-    return render_template('404.html')
-
-
-@app.route('/400.html')
-def x400():
-    return render_template('400.html')
-
-@app.route('/666.html')
-def x666():
-    return render_template('666.html')
-
-@app.route('/recs.html')
-def recs():
-    return render_template('recs.html')
 
 # Error Handling
 @app.errorhandler(404)
