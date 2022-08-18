@@ -167,7 +167,7 @@ def url_redirect(id):
         return redirect(original_url)
     else:
         flash('Invalid URL')
-        return redirect('https://thc-lab.net/404.html')
+        return redirect('/404.html')
         # return redirect(url_for('index'))
 
 
