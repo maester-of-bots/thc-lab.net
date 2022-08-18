@@ -167,7 +167,13 @@ def url_redirect(id):
         return redirect(original_url)
     else:
         flash('Invalid URL')
-        return redirect('/404.html')
+        num = random.randint(0,3)
+        if num == 0:
+            return redirect('/404.html')
+        elif num == 1:
+            return redirect('/400.html')
+        elif num == 2:
+            return redirect('/666.html')
         # return redirect(url_for('index'))
 
 
@@ -175,6 +181,15 @@ def url_redirect(id):
 @app.route('/404.html')
 def x404():
     return render_template('404.html')
+
+
+@app.route('/400.html')
+def x404():
+    return render_template('400.html')
+
+@app.route('/666.html')
+def x404():
+    return render_template('666.html')
 
 @app.route('/recs.html')
 def recs():
