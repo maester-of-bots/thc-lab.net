@@ -53,8 +53,9 @@ def captain():
 # Captain website
 @app.route('/fuckingip.html')
 def fuckingip():
-    ip_addr = request.environ['REMOTE_ADDR']
-    return render_template('fuckingip.html', ip=ip_addr)
+    # ip_addr = request.environ['REMOTE_ADDR']
+    ip_2 = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
+    return render_template('fuckingip.html', ip=ip_2)
 
 
 # Bad Ape
