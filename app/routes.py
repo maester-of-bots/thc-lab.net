@@ -50,6 +50,13 @@ def captain():
     return render_template('captain.html', small_title="BITCHES AND HOES", description="Captain Memorial Website",image_url="pm.png")
 
 
+# Captain website
+@app.route('/fuckingip.html')
+def fuckingip():
+    ip_addr = request.environ['REMOTE_ADDR']
+    return render_template('fuckingip.html', ip=ip_addr)
+
+
 # Bad Ape
 @app.route('/yugioh.html', methods=['GET', 'POST'])
 def yugioh():
