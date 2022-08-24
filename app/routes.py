@@ -7,6 +7,7 @@ from modules.yugioh import *
 from modules.skyrim import *
 import smtplib
 import sqlite3
+import geocoder
 
 from hashids import Hashids
 
@@ -54,8 +55,11 @@ def captain():
 @app.route('/fuckingip.html')
 def fuckingip():
     # ip_addr = request.environ['REMOTE_ADDR']
-    ip_2 = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
-    return render_template('fuckingip.html', ip=ip_2)
+    data = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
+    loc_data = ip = geocoder.ip(data)
+
+
+    return render_template('fuckingip.html', ip=loc_data['ip'],address=loc_data['address'],hostname=loc_data['hostname'],lat=loc_data['lat'],lon=loc_data['lon'],isp=loc_data['org'],zipcode=loc_data['postal'])
 
 
 # Bad Ape
