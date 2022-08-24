@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 {% block content2 %}
 
-<h1>here's your fucking IP address.</h1><br><br>
-<h1><span >{{ ip }}</span></h1><br>
-<h2><span >{{ address }}</span></h2><br>
-<h2><span >{{ hostname }}</span></h2><br>
-<h2><span >{{ lat }}</span></h2><br>
-<h2><span >{{ lon }}</span></h2><br>
-<h2><span >{{ isp }}</span></h2><br>
-<h2><span >{{ zipcode }}</span></h2><br>
+<h1>here's your fucking public network data.</h1><br><br>
+<h2>your goddamn public address<span >{{ ip }}</span></h2><br>
+<h2>an approximate fucking location that's probably wrong as shit</h2><br><span >{{ address }}</span><br>
+<h2>some random fucking dns fuckery</h2><br><span >{{ hostname }}</span><br>
+<h2>your fucking latitude</h2><br><span >{{ lat }}</span><br>
+<h2>and your goddamn longitude</h2><br><span >{{ lon }}</span><br>
+<h2>might be the cocksucker you pay for internet</h2><br><span >{{ isp }}</span><br>
+<h2>stupid motherfucking zip code</h2><br><span >{{ zipcode }}</span><br>
 
 {% endblock %}
