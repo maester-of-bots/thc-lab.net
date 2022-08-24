@@ -4,7 +4,7 @@ from modules.passBuddy import *
 from modules.BOFH import *
 from modules.badape import *
 from modules.yugioh import *
-from modules.skyrim import *
+# from modules.skyrim import *
 import smtplib
 import sqlite3
 import geocoder
