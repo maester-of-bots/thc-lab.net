@@ -56,13 +56,7 @@ def captain():
 def fuckingip():
     # ip_addr = request.environ['REMOTE_ADDR']
     data = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
-    with open("datay.txt","w") as f:
-        f.write(data)
-        f.close()
     loc_data = geocoder.ip(data).json
-    with open("datax.txt","w") as f:
-        f.write(json.dumps(loc_data))
-        f.close()
     if 'hostname' in loc_data.keys():
         hostname = loc_data['hostname']
     else:
