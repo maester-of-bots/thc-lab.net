@@ -63,8 +63,11 @@ def fuckingip():
     with open("datax.txt","w") as f:
         f.write(json.dumps(loc_data))
         f.close()
-
-    return render_template('fuckingip.html', ip=loc_data['ip'],address=loc_data['address'],hostname=loc_data['hostname'],lat=loc_data['lat'],lon=loc_data['lng'],isp=loc_data['org'],zipcode=loc_data['postal'])
+    if 'hostname' in loc_data.keys():
+        hostname = loc_data['hostname']
+    else:
+        hostname = ''
+    return render_template('fuckingip.html', ip=loc_data['ip'],address=loc_data['address'],hostname=hostname,lat=loc_data['lat'],lon=loc_data['lng'],isp=loc_data['org'],zipcode=loc_data['postal'])
 
 
 # Bad Ape
