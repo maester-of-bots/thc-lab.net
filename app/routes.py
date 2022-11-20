@@ -142,6 +142,10 @@ def projects():
 @app.route('/sitemap.xml')
 def sitemap():
     return send_file('sitemap.xml')
+	
+@app.route('/dumbfuckery.pdf')
+def dumbfuckery():
+    return send_file('dumbfuckery.pdf')
 
 
 @app.route('/shorts', methods=('GET', 'POST'))
