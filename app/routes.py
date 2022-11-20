@@ -139,13 +139,15 @@ def badape():
 def projects():
     return render_template('projects.html', small_title='Projects', description="Description",image_url="image.jpg")
 
+
 @app.route('/sitemap.xml')
 def sitemap():
     return send_file('sitemap.xml')
-	
-@app.route('/dumbfuckery.pdf')
+
+
+@app.route('/dumbfuckery.html')
 def dumbfuckery():
-    return send_file('dumbfuckery.pdf')
+    return render_template('dumbfuckery.html')
 
 
 @app.route('/shorts', methods=('GET', 'POST'))
