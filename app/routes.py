@@ -8,6 +8,7 @@ from modules.yugioh import *
 import smtplib
 import sqlite3
 import geocoder
+import os
 
 from hashids import Hashids
 
@@ -49,6 +50,14 @@ def index():
 @app.route('/captain.html')
 def captain():
     return render_template('captain.html', small_title="BITCHES AND HOES", description="Captain Memorial Website",image_url="pm.png")
+
+
+# Captain website
+@app.route('/vizzyt.html')
+def vizzyt():
+    westeros = os.listdir('app/static/img/FFS/MiddleEarth')
+    middle_earth = os.listdir('app/static/img/FFS/Westeros')
+    return render_template('vizzyt.html', pics=(westeros+middle_earth))
 
 
 # Captain website
