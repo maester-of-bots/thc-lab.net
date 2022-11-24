@@ -3,3 +3,4 @@ __pycache__/
 venv/
 .other
 data/database.db
+app/static/dumbfuckery.pdf

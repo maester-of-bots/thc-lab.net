@@ -51,6 +51,11 @@ def index():
 def captain():
     return render_template('captain.html', small_title="BITCHES AND HOES", description="Captain Memorial Website",image_url="pm.png")
 
+# Captain website
+@app.route('/status.html')
+def status():
+    return render_template('status.html', small_title="Status Page", description="All the things I'm running")
+
 
 # Captain website
 @app.route('/vizzyt.html')
