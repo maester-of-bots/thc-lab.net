@@ -197,6 +197,12 @@ def x666():
 def recs():
     return render_template('recs.html')
 
+	D:\GitHub\thc-lab.net\app\static\img\FFS\Westeros
+	
+@app.route('/ffs/<pic>')
+def ffs_pic(pic):
+	return send_file(f'static/img/FFS/Westeros/{pic}')
+	
 @app.route('/<id>')
 def url_redirect(id):
     conn = get_db_connection()
