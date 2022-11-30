@@ -118,21 +118,24 @@ def allowed_file(filename):
 
 @app.route('/upload', methods=['POST'])
 def upload_image():
-    if 'file' not in request.files:
-        flash('No file part')
-        return redirect(request.url)
-    file = request.files['file']
-    if file.filename == '':
-        flash('No image selected for uploading')
-        return redirect(request.url)
-    if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        fuckyoupath = '/home/thc/apps/thc-lab.net/app/static/uploads/'
-        path = os.path.join(fuckyoupath, filename)
-        file.save(path)
-        return redirect(url_for('static', filename='uploads/' + filename), code=301)
-    else:
-        return render_template('upload.html', message="Upload failed, Allowed image types are -> png, jpg, jpeg, gif")
+    try:
+        if 'file' not in request.files:
+            flash('No file part')
+            return redirect(request.url)
+        file = request.files['file']
+        if file.filename == '':
+            flash('No image selected for uploading')
+            return redirect(request.url)
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            fuckyoupath = '/home/thc/apps/thc-lab.net/app/static/uploads/'
+            path = os.path.join(fuckyoupath, filename)
+            file.save(path)
+            return redirect(url_for('static', filename='uploads/' + filename), code=301)
+        else:
+            return render_template('upload.html', message="Upload failed, Allowed image types are -> png, jpg, jpeg, gif")
+    except Exception as e:
+        return e
 
 @app.route('/display/<filename>')
 def display_image(filename):
