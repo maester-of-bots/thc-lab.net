@@ -125,7 +125,8 @@ def upload_image():
         return redirect(request.url)
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
-        path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        fuckyoupath = '/home/thc/apps/thc-lab.net/app/static/uploads/'
+        path = os.path.join(fuckyoupath, filename)
         file.save(path)
         return redirect(url_for('static', filename='uploads/' + filename), code=301)
     else:
