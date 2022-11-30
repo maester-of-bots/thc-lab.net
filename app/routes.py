@@ -132,7 +132,7 @@ def upload_image():
         file.save(path)
         return redirect(url_for('static', filename='uploads/' + filename), code=301)
     else:
-        return redirect(request.url, message="Upload failed, Allowed image types are -> png, jpg, jpeg, gif")
+        return render_template('upload.html', message="Upload failed, Allowed image types are -> png, jpg, jpeg, gif")
 
 @app.route('/display/<filename>')
 def display_image(filename):
