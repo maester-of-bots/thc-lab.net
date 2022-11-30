@@ -11,6 +11,7 @@ import geocoder
 import os
 
 from hashids import Hashids
+from werkzeug.utils import secure_filename
 
 
 def emailSender(content):
@@ -108,18 +109,39 @@ def bofh():
     return render_template('bofh.html', small_title='IT Help Desk', response=response, link=lmgtfy,
                            description="Description", image_url="image.jpg")
 
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
-# Text Messages
-@app.route('/secure/texts.html', methods=['POST'])
-def texts():
-    ip = request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr)
-    if request.method == 'POST' and '216.36.27.41' in ip:
-        emailSender(request.headers.get('content'))
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.route('/upload', methods=['POST'])
+def upload_image():
+    if 'file' not in request.files:
+        flash('No file part')
+        return redirect(request.url)
+    file = request.files['file']
+    if file.filename == '':
+        flash('No image selected for uploading')
+        return redirect(request.url)
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(path)
+        return redirect(url_for('static', filename='uploads/' + filename), code=301)
     else:
-        requests.get(
-            "https://api.telegram.org/bot5585546662:AAG4_54V68C4howzaqkVwsRTW5WAQeYAH5c/sendMessage?chat_id=-426528357&text=Unauthorized API Usage from {}".format(
-                ip))
+        flash('Allowed image types are -> png, jpg, jpeg, gif')
+        return redirect(request.url)
 
+@app.route('/display/<filename>')
+def display_image(filename):
+    return redirect(url_for('static', filename='uploads/' + filename), code=301)
+
+
+
+
+@app.route('/art.html')
+def art():
+    return render_template('art.html')
 
 # Password generator
 @app.route('/pass.html', methods=['GET', 'POST'])
@@ -163,11 +185,6 @@ def projects():
 @app.route('/sitemap.xml')
 def sitemap():
     return send_file('sitemap.xml')
-
-
-@app.route('/dumbfuckery.html')
-def dumbfuckery():
-    return render_template('dumbfuckery.html')
 
 
 @app.route('/shorts', methods=('GET', 'POST'))
@@ -214,6 +231,7 @@ def x666():
 @app.route('/recs.html')
 def recs():
     return render_template('recs.html')
+
 
 
 @app.route('/ffs/<pic>')
