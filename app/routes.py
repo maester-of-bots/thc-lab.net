@@ -14,20 +14,39 @@ from hashids import Hashids
 from werkzeug.utils import secure_filename
 
 
-def emailSender(content):
-    to = "5714779283@tmomail.net"
-    sender = "steven.haering@gmail.com"
-    key = "wilkbcaineyzjein"
-    server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-    server.login(sender, key)
-    server.sendmail(sender, to, content)
+import socket
+
+def get_ips():
+    data1 = socket.gethostbyname_ex("thc-lab.net")
+    data2 = socket.gethostbyname_ex("home.thc-lab.net")
+    total = list(data1+data2)
+    ips = []
+
+    for thing in total:
+        if thing == []:
+            check = "thc"
+        elif type(thing) == list:
+            check = thing[0]
+        elif type(thing) == str:
+            check = thing
+        else:
+            check = "thc"
+        if "thc" in check:
+            pass
+        else:
+            ips.append(check)
 
 
-'''
-small_title="Title", description="Description",image_url="image.jpg", 
-description
-image_url
-		'''
+    return ips
+
+def secCheck(address):
+    if address in get_ips():
+        return True
+    else:
+        return False
+
+
+
 
 # Init Yugioh cards
 cards = getAllCards()
@@ -118,24 +137,35 @@ def allowed_file(filename):
 
 @app.route('/art.html', methods=['POST'])
 def art_post():
-    try:
-        if 'file' not in request.files:
-            flash('No file part')
-            return redirect(request.url)
-        file = request.files['file']
-        if file.filename == '':
-            flash('No image selected for uploading')
-            return redirect(request.url)
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            fuckyoupath = '/home/thc/apps/thc-lab.net/app/static/uploads/'
-            path = os.path.join(fuckyoupath, filename)
-            file.save(path)
-            return redirect(url_for('static', filename='uploads/' + filename), code=301)
-        else:
-            return "Upload failed, Allowed image types are -> png, jpg, jpeg, gif"
-    except Exception as e:
-        return e
+    result = request.form
+
+    data = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
+
+    print(data)
+
+    if secCheck(data) and result['code'] == 'fuck you you fucking fuck':
+
+        url = result['url']
+
+
+        name = result['filename']
+
+        data = requests.get(url)
+
+
+
+        path = f'app/static/uploads/{name}'
+
+        with open(path,'wb') as image:
+            image.write(data.content)
+
+        newpath = f'https://thc-lab.net/static/uploads/{name}'
+
+        return newpath
+
+    else:
+        return "Hey, you're not THC!"
+
 
 
 @app.route('/art.html', methods=['GET'])
