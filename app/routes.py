@@ -116,8 +116,8 @@ def allowed_file(filename):
 
 # x
 
-@app.route('/upload', methods=['POST'])
-def upload_image():
+@app.route('/art', methods=['POST'])
+def art_post():
     try:
         if 'file' not in request.files:
             flash('No file part')
@@ -133,9 +133,14 @@ def upload_image():
             file.save(path)
             return redirect(url_for('static', filename='uploads/' + filename), code=301)
         else:
-            return render_template('upload.html', message="Upload failed, Allowed image types are -> png, jpg, jpeg, gif")
+            return "Upload failed, Allowed image types are -> png, jpg, jpeg, gif"
     except Exception as e:
         return e
+
+
+@app.route('/art.html', methods=['GET'])
+def art():
+    return render_template('art.html')
 
 @app.route('/display/<filename>')
 def display_image(filename):
@@ -143,10 +148,6 @@ def display_image(filename):
 
 
 
-
-@app.route('/art.html')
-def art():
-    return render_template('art.html')
 
 # Password generator
 @app.route('/pass.html', methods=['GET', 'POST'])
