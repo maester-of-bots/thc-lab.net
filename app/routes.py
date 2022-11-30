@@ -116,7 +116,7 @@ def allowed_file(filename):
 
 # x
 
-@app.route('/art', methods=['POST'])
+@app.route('/art.html', methods=['POST'])
 def art_post():
     try:
         if 'file' not in request.files:
