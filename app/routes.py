@@ -147,14 +147,16 @@ def art_post():
 
         url = result['url']
 
+        subdir = result['subdir']
 
         name = result['filename']
 
+        if subdir == 'None':
+            path = f'app/static/uploads/{name}'
+        else:
+            path = f'app/static/{subdir}/{name}'
+
         data = requests.get(url)
-
-
-
-        path = f'app/static/uploads/{name}'
 
         with open(path,'wb') as image:
             image.write(data.content)
