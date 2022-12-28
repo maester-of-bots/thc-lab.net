@@ -153,15 +153,17 @@ def art_post():
 
         if subdir == 'None':
             path = f'app/static/uploads/{name}'
+            newpath = f'https://thc-lab.net/static/uploads/{name}'
         else:
             path = f'app/static/{subdir}/{name}'
+            newpath = f'https://thc-lab.net/static/{subdir}/{name}'
 
         data = requests.get(url)
 
         with open(path,'wb') as image:
             image.write(data.content)
 
-        newpath = f'https://thc-lab.net/static/{subdir}/{name}'
+
 
         return newpath
 
