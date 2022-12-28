@@ -161,7 +161,7 @@ def art_post():
         with open(path,'wb') as image:
             image.write(data.content)
 
-        newpath = f'https://thc-lab.net/static/uploads/{name}'
+        newpath = f'https://thc-lab.net/static/{subdir}/{name}'
 
         return newpath
 
@@ -176,7 +176,10 @@ def art():
 
 @app.route('/display/<filename>')
 def display_image(filename):
-    return redirect(url_for('static', filename='uploads/' + filename), code=301)
+    if 'tapestries' in filename:
+        return redirect(url_for('static', filename='tapestries/' + filename), code=301)
+    else:
+        return redirect(url_for('static', filename='uploads/' + filename), code=301)
 
 
 
