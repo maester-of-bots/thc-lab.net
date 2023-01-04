@@ -4,4 +4,7 @@ venv/
 .other
 data/database.db
 app/static/dumbfuckery.pdf
-app/static/uploads
+app/static/uploads/*
+app/static/simon_bots/*
+
+
