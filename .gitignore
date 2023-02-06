@@ -8,3 +8,4 @@ app/static/uploads/*
 app/static/simon_bots/*
 
 
+.env

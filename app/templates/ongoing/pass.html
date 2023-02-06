@@ -1,0 +1,156 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Bad Ape {% endblock %}
+
+<!-- Element injected in the BODY element -->
+{% block body_class %} sidebar-mini {% endblock body_class %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+
+  <!-- Google Font: Source Sans Pro -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="/static/assets/plugins/fontawesome-free/css/all.min.css">
+  <!-- Ionicons -->
+  <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+  <!-- Tempusdominus Bootstrap 4 -->
+  <link rel="stylesheet" href="/static/assets/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
+  <!-- iCheck -->
+  <link rel="stylesheet" href="/static/assets/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+  <!-- JQVMap -->
+  <link rel="stylesheet" href="/static/assets/plugins/jqvmap/jqvmap.min.css">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="/static/assets/css/adminlte.min.css">
+  <!-- overlayScrollbars -->
+  <link rel="stylesheet" href="/static/assets/plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
+  <!-- Daterange picker -->
+  <link rel="stylesheet" href="/static/assets/plugins/daterangepicker/daterangepicker.css">
+  <!-- summernote -->
+  <link rel="stylesheet" href="/static/assets/plugins/summernote/summernote-bs4.min.css">
+
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="content-wrapper">
+
+	<div class="content-header">
+		<div class="container-fluid">
+
+        <div class="row">
+          <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-info">
+              <div class="inner">
+                <h3>For Kids</h3>
+                  <form method="POST" action="/pass.html">
+                    <button class="button" name="kids" type="submit" style="vertical-align:middle">
+					<span STYLE="font-size: 10pt"><br/>
+						({{kid_count}} possible passwords!)
+					</span>
+                    </button>
+                  </form>
+              </div>
+              <div class="icon">
+                <i class="ion ion-stats-bars"></i>
+              </div>
+            </div>
+          </div>
+
+
+          <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-info">
+              <div class="inner">
+                <h3>For Teens</h3>
+                  <form method="POST" action="/pass.html">
+                    <button class="button" name="teens" type="submit" style="vertical-align:middle">
+					<span STYLE="font-size: 10pt"><br/>
+						({{teen_count}} possible passwords!)
+					</span>
+                    </button>
+                  </form>
+              </div>
+              <div class="icon">
+                <i class="ion ion-stats-bars"></i>
+              </div>
+            </div>
+          </div>
+
+
+          <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-info">
+              <div class="inner">
+                <h3>For Work</h3>
+                  <form method="POST" action="/pass.html">
+                    <button class="button" name="adults" type="submit" style="vertical-align:middle">
+					<span STYLE="font-size: 10pt"><br/>
+						({{adult_count}} possible passwords!)
+					</span>
+                    </button>
+                  </form>
+              </div>
+              <div class="icon">
+                <i class="ion ion-stats-bars"></i>
+              </div>
+            </div>
+          </div>
+
+
+          <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-info">
+              <div class="inner">
+                <h3>Swears</h3>
+                  <form method="POST" action="/pass.html">
+                    <button class="button" name="swears" type="submit" style="vertical-align:middle">
+					<span STYLE="font-size: 10pt"><br/>
+						({{swear_count}} possible passwords!)
+					</span>
+                    </button>
+                  </form>
+              </div>
+              <div class="icon">
+                <i class="ion ion-stats-bars"></i>
+              </div>
+            </div>
+          </div>
+
+
+          <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-info">
+              <div class="inner">
+                <h3>Adult - 18+</h3>
+                  <form method="POST" action="/pass.html">
+                    <button class="button" name="sex" type="submit" style="vertical-align:middle">
+					<span STYLE="font-size: 10pt"><br/>
+						({{xxx_count}} possible passwords!)
+					</span>
+                    </button>
+                  </form>
+              </div>
+              <div class="icon">
+                <i class="ion ion-stats-bars"></i>
+              </div>
+            </div>
+          </div>
+          <!-- ./col -->
+        </div>
+
+
+        <div class="row">
+          <div class="col-md-8">
+
+            <span id="pass" class="info">{{password}}</span>
+            <br/><br/><br/><br/>
+            <span id="plain" class="info2">({{plaintext}})</span>
+            <br/><br/>
+            <div>{{previous}}</div>
+          </div>
+            </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

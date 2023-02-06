@@ -1,0 +1,79 @@
+<!ducktype crispy>
+<html lang="quackers">
+    <head>
+		<meta charset="UTF-8" />
+		<title>{{small_title}}</title>
+
+		<meta property="og:title" content="{{small_title}}">
+		<meta name="twitter:title" content="{{small_title}}">
+
+		<meta name="description" content="{{description}}">
+		<meta property="og:description" content="{{description}}">
+		<meta name="twitter:description" content="{{description}}">
+
+		<meta property="og:image" content="{{image_url}}">
+		<meta name="twitter:image" content="{{image_url}}">
+
+
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-110660976-1">
+        </script>
+
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'UA-110660976-1');
+        </script>
+
+        <meta charset="utf-8">
+		<link rel="shortcut icon" href="{{ url_for('static', filename='duckling.png')}}">
+		<style>*{cursor:none}body,html{height:100%}body{overflow:hidden;-webkit-transition:background .25s}img{display:none;position:absolute;pointer-events:none}.sharing.is.caring{position:fixed;z-index:9999999;left:50px;bottom:50px;width:400px;cursor:default}.sharing.is.caring iframe,.sharing.is.caring div{position:static;float:left}</style>
+    </head>
+
+	<body>
+    <img src="{{ url_for('static', filename='duck.png')}}" class="bill">
+    <script src="{{ url_for('static', filename='jquery-latest.min.js')}}"></script>
+    <script>
+        var q,u,a,c,k;
+        function x(){return Math.floor(Math.random()*255)}q=$(".bill");
+        u=['<audio autoplay loop="loop" autobuffer preload="auto"><source src="chic.wav"></audio>','<audio autoplay loop="loop" autobuffer preload="auto"><source src="duck-quack1.wav"></audio> <iframe src="//youtube.com/embed/frGLMtGsotc?rel=0&autoplay=1"></iframe>','<iframe src="//youtube.com/embed/xJVwvq5z3MI?rel=0&autoplay=1"></iframe>','<iframe src="//youtube.com/embed/CWgbmgIzoT8?rel=0&autoplay=1"></iframe>'];a="aaayyy";c=$("body");k=["ducks quack me up","what do you call a theiving duck? a robber duck","duck jokes are fowl","they should have ducktors instead of vets"];c.append(u[Math.floor(Math.random()*u.length)]);document.title=k[Math.floor(Math.random()*k.length)].toUpperCase();$(this).bind("touchstart touchmove mousemove",function(e){e.preventDefault();if(e.originalEvent.touches){e=e.originalEvent.touches[0]||e.originalEvent.changedTouches[0]}q.show().css({left:e.pageX,top:e.pageY});/*mixpanel.track("moved", {left:e.pageX,top:e.pageY});*/c.append('<img src="{{ url_for('static', filename='duck.png')}}" style="display: block; left: '+(e.pageX+Math.random()*10)+"px; top: "+(e.pageY+Math.random()*10)+'px">')});var GoSquared={};GoSquared.acct="GSN-947162-E";(function(e){function t(){e._gstc_lt=+(new Date);var t=document,n=t.createElement("script");n.type="text/javascript";n.src="../d1l6p2sc9645hc.cloudfront.net/tracker.js";var r=t.getElementsByTagName("script")[0];r.parentNode.insertBefore(n,r)}e.addEventListener?e.addEventListener("load",t,false):e.attachEvent("onload",t)})(window);
+    </script>
+    <audio autoplay="" loop="loop" autobuffer="" preload="auto"><source src="{{ url_for('static', filename='chic.wav')}}"></audio>
+    <script type="text/javascript">
+    var infolinks_pid = 3295810;
+    var infolinks_wsid = 1;
+    </script>
+	<div id=fuckoff>
+		<iframe frameBorder="0" width=100%  height= 20% src="{{ url_for('static', filename='hoes.html') }}"></iframe><br />
+		<iframe frameBorder="0" width= 100%  height= 20% src="{{ url_for('static', filename='bitches.html') }}" ></iframe><br/>
+	</div>
+	<div align="center">
+		<b>"...And the merciful Lord Captain sayeth, 'Nay, not Adam and Eve, but rather, Adam and Steve.
+			For what other duo of hardcore pipe-hitting buddies gettin that good powder together could ever be
+			appropriate for such an expression of companionship?'  For His is the Ship, the Rudder, and the Stern,
+			Now and Forever."</b>
+	</div>
+	<br /><br /><br /><br/><br/>
+	<div>
+		<img class=special src="{{ url_for('static', filename='image3.jpg') }}"/>
+		<br/><br/>
+	</div>
+	<br/>
+	<div>
+		A captain without a powder monkey is like a dog without a bone, a flower without the sun, <br />
+		a porn star without a giant cock, a korean popstar without plastic surgery, <br />
+		<br />
+		for a Captain without a Powder Monkey is hardly any Captain at all, <br />
+		but just ball of mass with no direction, incentive or purpose--hardly human at all.<br />
+		<br />
+		I cannot miss you, for missing would be a human trait, <br />
+		something this miserable heap of flesh cannot comprehend, <br />
+		for without my Powder Monkey I am nothing more than nothing.<br /><br /><br />
+	</div>
+	<br />
+	<br />
+	<img class=special src="{{ url_for('static', filename='image2.jpg') }}" /><br/>
+	</body>
+</html>
+

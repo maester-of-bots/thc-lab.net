@@ -1,0 +1,71 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Bad Ape {% endblock %}
+
+<!-- Element injected in the BODY element -->
+{% block body_class %} sidebar-mini {% endblock body_class %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+
+  <!-- Google Font: Source Sans Pro -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="/static/assets/plugins/fontawesome-free/css/all.min.css">
+  <!-- Ionicons -->
+  <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+  <!-- Tempusdominus Bootstrap 4 -->
+  <link rel="stylesheet" href="/static/assets/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
+  <!-- iCheck -->
+  <link rel="stylesheet" href="/static/assets/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+  <!-- JQVMap -->
+  <link rel="stylesheet" href="/static/assets/plugins/jqvmap/jqvmap.min.css">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="/static/assets/css/adminlte.min.css">
+  <!-- overlayScrollbars -->
+  <link rel="stylesheet" href="/static/assets/plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
+  <!-- Daterange picker -->
+  <link rel="stylesheet" href="/static/assets/plugins/daterangepicker/daterangepicker.css">
+  <!-- summernote -->
+  <link rel="stylesheet" href="/static/assets/plugins/summernote/summernote-bs4.min.css">
+
+{% endblock stylesheets %}
+{% block content %}
+  <div class="content-wrapper">
+
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+      <div class="container-fluid">
+
+          Thanks for visiting THC's ShillPoints(tm) Counter! <br><br>
+          Enter the username you want to check.  It takes about 15 seconds to crawl the post history.  <br><br>
+          Data is based on the karma count from any activity on gme_meltdown in their last 1,000 posts / 1,000 comments.  <br><br><br>
+          Please reach out to <a href="mailto: reddit@thc-lab.net">THC-Lab</a> for any questions or suggestions.<br><br><br>
+
+        <form action="/badape.html" method = "POST">
+            <p>Username: <input type = "text" name = "Name" /></p>
+            <p><input type = "submit" value = "Submit" onclick="(function(){alert('Checking, give it like...15 seconds.');})();" /></p>
+        </form>
+
+        <h1>
+            <font size="10">{{ response }}</font>
+        </h1>
+
+        <br><br/><br/>
+
+        <h2>
+            <font size="8">{{ meltPosts }}</font>
+        </h2>
+        <h2>
+            <font size="8">{{ meltComments }}</font>
+        </h2>
+
+        <br><br/><br/>
+        <div>
+            {{previous}}
+        </div>
+      </div>
+    </div>
+  </div>
+
+          {% endblock %}
