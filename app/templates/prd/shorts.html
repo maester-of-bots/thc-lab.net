@@ -51,9 +51,21 @@
     </div>
     </form>
 
+
     {% if short_url %}
-    <hr>
-    <span>{{ short_url }}</span>
+     <h1><span >{{ short_url }}</span></h1>
+    <button id="btn">Copy URL</button>
+    <script>
+        const btn = document.getElementById('btn');
+
+        btn.addEventListener('click', function handleClick() {
+          btn.textContent = 'Copied!';
+        });
+
+        navigator.clipboard.writeText
+            ("{{ short_url }}")
+    </script>
     {% endif %}
+
         </div></div></div>
 {% endblock %}
