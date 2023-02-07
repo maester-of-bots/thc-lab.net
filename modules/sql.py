@@ -27,7 +27,7 @@ class db:
             user=self.user,
             password=self.password,
             host=self.server,
-            port=25060,)
+            port=self.port,)
             #sslmode='require')
 
         return conn
