@@ -1,6 +1,6 @@
-DROP TABLE IF EXISTS urls_biscuit;
+DROP TABLE IF EXISTS urls_thc;
 
-CREATE TABLE urls_biscuit (
+CREATE TABLE urls_thc (
     id SERIAL PRIMARY KEY,
     created TIMESTAMP NOT NULL DEFAULT NOW(),
     original_url TEXT NOT NULL,

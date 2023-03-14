@@ -1,10 +1,10 @@
 from modules.sql import *
 
-connection = DB.get_db()
+connection = db().get_db()
 cur = connection.cursor()
 
 with cur as cursor:
-    cursor.execute(open("test.sql", "r").read())
+    cursor.execute(open("cloud.sql", "r").read())
 
 connection.commit()
 connection.close()

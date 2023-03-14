@@ -1,0 +1,45 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Bad Ape {% endblock %}
+
+<!-- Element injected in the BODY element -->
+{% block body_class %} sidebar-mini {% endblock body_class %}
+
+{% block content %}
+<div class="content-wrapper">
+
+	<div class="content-header">
+		<div class="container-fluid">
+
+
+    <form method="post">
+    <div class="form-group">
+        <label for="url">URL</label>
+        <input type="text" name="url"
+               placeholder="URL to shorten" class="form-control"
+               value="{{ request.form['url'] }}" autofocus></input>
+    </div>
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+    </form>
+
+
+    {% if short_url %}
+     <h1><span >{{ short_url }}</span></h1>
+    <button id="btn">Copy URL</button>
+    <script>
+        const btn = document.getElementById('btn');
+
+        btn.addEventListener('click', function handleClick() {
+          btn.textContent = 'Copied!';
+        });
+
+        navigator.clipboard.writeText
+            ("{{ short_url }}")
+    </script>
+    {% endif %}
+
+        </div></div></div>
+{% endblock %}
