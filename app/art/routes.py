@@ -55,6 +55,7 @@ def secCheck(address):
         return False
 
 
+
 @blueprint.route('/art.html', methods=['POST'])
 def art_post():
     result = request.form
@@ -70,11 +71,11 @@ def art_post():
         name = result['filename']
 
         if subdir == 'None':
-            path = f'app/static/uploads/{name}'
-            newpath = f'https://thc-lab.net/static/uploads/{name}'
+            path = f'app/static/shared/all/{name}'
+            newpath = f'https://thc-lab.net/static/shared/all/{name}'
         else:
-            path = f'app/static/{subdir}/{name}'
-            newpath = f'https://thc-lab.net/static/{subdir}/{name}'
+            path = f'app/static/shared/{subdir}/{name}'
+            newpath = f'https://thc-lab.net/static/shared/{subdir}/{name}'
 
         data = requests.get(url)
 
@@ -95,12 +96,10 @@ def art():
 @blueprint.route('/display/<filename>')
 def display_image(filename):
     if 'tapestries' in filename:
-        return redirect(url_for('static', filename='tapestries/' + filename), code=301)
+        dirname = 'tapestries/'
+    elif "variation" in filename.lower():
+        dirname = "variations"
     else:
-        return redirect(url_for('static', filename='uploads/' + filename), code=301)
+        dirname = "all"
 
-
-@blueprint.route('/ffs/<pic>')
-def ffs_pic(pic):
-    return send_file(f'static/img/FFS/Westeros/{pic}')
-
+    return redirect(url_for('static', filename=dirname + filename), code=301)
