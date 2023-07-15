@@ -94,7 +94,7 @@ def art():
 
 @blueprint.route('static/uploads/backgrounds/<filename>')
 def display_background(filename):
-    dirname = 'shared/backgrounds'
+    dirname = 'shared/backgrounds/'
     return redirect(url_for('static', filename=dirname + filename), code=301)
 
 
