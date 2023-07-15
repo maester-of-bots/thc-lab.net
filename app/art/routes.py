@@ -92,14 +92,19 @@ def art_post():
 def art():
     return render_template('art/art.html')
 
+@blueprint.route('static/uploads/backgrounds/<filename>')
+def display_background(filename):
+    dirname = 'shared/backgrounds'
+    return redirect(url_for('static', filename=dirname + filename), code=301)
+
 
 @blueprint.route('/display/<filename>')
 def display_image(filename):
     if 'tapestries' in filename:
-        dirname = 'tapestries/'
+        dirname = 'shared/tapestries/'
     elif "variation" in filename.lower():
-        dirname = "variations"
+        dirname = "shared/variations"
     else:
-        dirname = "all"
+        dirname = "shared/all"
 
     return redirect(url_for('static', filename=dirname + filename), code=301)
