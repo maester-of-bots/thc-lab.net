@@ -97,6 +97,19 @@ def display_background(filename):
     dirname = 'shared/backgrounds/'
     return redirect(url_for('static', filename=dirname + filename), code=301)
 
+@blueprint.route('static/uploads/backgrounds/<filename>')
+def display_background(filename):
+    dirname = 'shared/backgrounds/'
+    return redirect(url_for('static', filename=dirname + filename), code=301)
+
+@blueprint.route('static/uploads/<filename>')
+def old_uploads(filename):
+    if "Variation" in filename:
+        dirname = "shared/variations"
+    else:
+        dirname = "shared/all/"
+
+    return redirect(url_for('static', filename=dirname + filename), code=301)
 
 @blueprint.route('/display/<filename>')
 def display_image(filename):
