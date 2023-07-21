@@ -97,10 +97,12 @@ def display_background(filename):
     dirname = 'shared/backgrounds/'
     return redirect(url_for('static', filename=dirname + filename), code=301)
 
+'''
 @blueprint.route('static/uploads/backgrounds/<filename>')
 def display_background(filename):
     dirname = 'shared/backgrounds/'
     return redirect(url_for('static', filename=dirname + filename), code=301)
+'''
 
 @blueprint.route('static/uploads/<filename>')
 def old_uploads(filename):
