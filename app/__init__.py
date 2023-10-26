@@ -65,7 +65,7 @@ def create_app(config):
 
         register_extensions(app)
 
-        for module in ['art', 'auth', 'badape', 'BOFH', 'captain', 'errors','home','password_gen','shorts','YuGiOh']:
+        for module in ['art', 'auth', 'badape', 'BOFH', 'captain', 'errors','home','minecraft','password_gen','shorts','YuGiOh']:
             module = import_module(f'app.{module}.routes')
             app.register_blueprint(module.blueprint)
             print(f'Loaded {module}')
