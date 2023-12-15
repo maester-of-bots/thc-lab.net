@@ -41,6 +41,12 @@ def index():
                            description="Description",
                            image_url="image.jpg")
 
+# Main page, there's nothing here...
+@blueprint.route('/legal', methods=['GET'])
+def index():
+
+    return render_template('home/legal.html')
+
 
 @blueprint.route('/status.html')
 def status():
