@@ -43,7 +43,7 @@ def index():
 
 # Main page, there's nothing here...
 @blueprint.route('/legal', methods=['GET'])
-def index():
+def gay():
 
     return render_template('home/legal.html')
 
