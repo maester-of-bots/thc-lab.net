@@ -12,7 +12,7 @@ reddit = praw.Reddit(
     client_id="0_5rYgh-yIankukZyspLog",
     client_secret="lSxnxGJo1-rdiY6h5kSTcfxEwDPkkQt",
     password="FuckYouRedditPigs69420!",
-    user_agent="badape-useragent",
+    user_agent="BadApe_2024",
     username="THC_Lab",
 )
 
