@@ -9,11 +9,11 @@ from operator import itemgetter
 
 load_dotenv()
 reddit = praw.Reddit(
-    client_id="badape-client",
-    client_secret="badape-secret",
-    password="badape-password",
+    client_id="0_5rYgh-yIankukZyspLog",
+    client_secret="lSxnxGJo1-rdiY6h5kSTcfxEwDPkkQt",
+    password="FuckYouRedditPigs69420!",
     user_agent="badape-useragent",
-    username="badape-username",
+    username="THC_Lab",
 )
 
 def getScores(subreddit,timerange,limit):
