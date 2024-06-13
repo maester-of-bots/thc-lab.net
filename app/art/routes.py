@@ -62,7 +62,7 @@ def art_post():
 
     data = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
 
-    if secCheck(data) and result['code'] == 'fuck you you fucking fuck':
+    if secCheck(data) and result['code'] == 'Yesbecausethisissecure101$':
 
         url = result['url']
 
