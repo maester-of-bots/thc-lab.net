@@ -1,15 +1,8 @@
-from flask import Blueprint, request, render_template, redirect, url_for, send_file
-import requests
-from flask import render_template, request
-from app import app
-import random
-from flask import Blueprint
 from variations import *
 
-from flask import Blueprint, request, render_template, redirect, url_for, send_file
+from flask import Blueprint, request, render_template, redirect, url_for
 import requests
 
-import socket
 import socket
 
 from app.art import blueprint
