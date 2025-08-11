@@ -70,6 +70,7 @@ def art_post():
         return newpath
 
     else:
+        print(result['code'])
         return "Hey, you're not THC!"
 
 
