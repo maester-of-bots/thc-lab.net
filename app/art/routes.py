@@ -71,7 +71,7 @@ def art_post():
 
     else:
         print(result['code'])
-        return "Hey, you're not THC!"
+        return result['code']#"Hey, you're not THC!"
 
 
 @blueprint.route('/art.html', methods=['GET'])
