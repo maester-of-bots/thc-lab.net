@@ -79,7 +79,11 @@ def variation():
 
     result = request.form
 
+    print("Got a request.")
+
     data = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
+
+    print(data)
 
     if secCheck(data) and result['code'] == 'fuck you you fucking fuck':
 
@@ -90,8 +94,11 @@ def variation():
 
         return "\n".join(new_urls)
 
+    elif not secCheck(data):
+        return "Bad IP."
+
     else:
-        return "Hey, you're not THC!"
+        return "Bad peen!"
 
 @blueprint.route('static/uploads/backgrounds/<filename>')
 def display_background(filename):
