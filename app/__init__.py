@@ -19,22 +19,23 @@ def register_extensions(app):
     db.init_app(app)
     login_manager.init_app(app)
 
-
 def configure_database(app):
-    @app.before_first_request
     def initialize_database():
         try:
             db.create_all()
         except Exception as e:
-
             print('> Error: DBMS Exception: ' + str(e))
 
             # fallback to SQLite
             basedir = os.path.abspath(os.path.dirname(__file__))
             app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'db.sqlite3')
-
+            # Gay
             print('> Fallback to SQLite ')
             db.create_all()
+
+    # Call initialize_database immediately instead of using before_first_request
+    with app.app_context():
+        initialize_database()
 
     @app.teardown_request
     def shutdown_session(exception=None):

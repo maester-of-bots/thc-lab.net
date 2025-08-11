@@ -18,7 +18,6 @@ DEBUG = 'False' # (os.getenv('DEBUG', 'False') == 'True')
 # The configuration
 get_config_mode = 'Debug' if DEBUG else 'Production'
 
-
 def configure_database(app):
     def initialize_database():
         try:
@@ -40,6 +39,7 @@ def configure_database(app):
     @app.teardown_request
     def shutdown_session(exception=None):
         db.session.remove()
+
 
 
 try:
