@@ -1,4 +1,4 @@
-from variations import *
+from app.art.variations import *
 
 from flask import Blueprint, request, render_template, redirect, url_for
 import requests
