@@ -47,7 +47,7 @@ def art_post():
 
     data = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
 
-    if secCheck(data) and (result['code'] == 'Yesbecausethisissecure101$' or result['code'] == 'fuck you you fucking fuck'):
+    if secCheck(data) and result['code'] == 'Yesbecausethisissecure101$':
 
         url = result['url']
 
@@ -74,20 +74,16 @@ def art_post():
         return result['code']#"Hey, you're not THC!"
 
 
-@blueprint.route('/art.html', methods=['GET'])
-def art():
-    return render_template('art/art.html')
-
-
 @blueprint.route('/variation', methods=['POST'])
 def variation():
-    AI = oldOpenAI()
 
     result = request.form
 
     data = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
 
-    if secCheck(data) and result['code'] == 'Yesbecausethisissecure101$':
+    if secCheck(data) and result['code'] == 'fuck you you fucking fuck':
+
+        AI = oldOpenAI()
 
         new_urls = AI.variation(result['url'])
 
