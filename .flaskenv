@@ -1,1 +1,2 @@
-FLASK_APP=main
+FLASK_APP=app.run
+SECRET_KEY=verysecretkey
