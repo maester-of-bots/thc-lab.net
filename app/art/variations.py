@@ -35,6 +35,7 @@ class oldOpenAI:
             URLs = []
             for i, data in enumerate(response["data"]):
                 URLs.append(data["url"])
+                print(data["url"])
 
             os.remove('tmp.png')
             return URLs

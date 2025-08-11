@@ -86,6 +86,7 @@ def variation():
         AI = oldOpenAI()
 
         new_urls = AI.variation(result['url'])
+        print(new_urls)
 
         return "\n".join(new_urls)
 
