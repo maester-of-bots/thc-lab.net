@@ -74,7 +74,7 @@ def art_post():
         return result['code']#"Hey, you're not THC!"
 
 
-@blueprint.route('/variation', methods=['POST'])
+@blueprint.route('/variation.html', methods=['POST'])
 def variation():
 
     result = request.form
