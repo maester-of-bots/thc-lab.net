@@ -20,12 +20,10 @@ get_config_mode = 'Debug' if DEBUG else 'Production'
 
 
 def configure_database(app):
-    @app.before_first_request
     def initialize_database():
         try:
             db.create_all()
         except Exception as e:
-
             print('> Error: DBMS Exception: ' + str(e))
 
             # fallback to SQLite
@@ -34,6 +32,10 @@ def configure_database(app):
 
             print('> Fallback to SQLite ')
             db.create_all()
+
+    # Call initialize_database immediately instead of using before_first_request
+    with app.app_context():
+        initialize_database()
 
     @app.teardown_request
     def shutdown_session(exception=None):
