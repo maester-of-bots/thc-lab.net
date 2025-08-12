@@ -35,10 +35,6 @@ def secCheck(address):
             pass
         else:
             ips.append(check)
-
-        print(address)
-        print("Eat shit bro")
-        print(ips)
         if address in ips:
             return True
         else:
@@ -51,7 +47,12 @@ def art_post():
 
     data = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
 
-    print(data)
+    ip = request.headers.get('X-Real-IP') or request.remote_addr
+
+    print(ip)
+
+    print("Gay")
+    print(request.headers)
 
     if secCheck(data) and result['code'] == 'Yesbecausethisissecure101$':
 
