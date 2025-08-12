@@ -16,9 +16,9 @@ def allowed_file(filename):
 
 
 def secCheck(address):
-    data1 = socket.gethostbyname_ex("thc-lab.net")
-    data2 = socket.gethostbyname_ex("home.thc-lab.net")
-    total = list(data1[2] + data2[2])
+    data1 = socket.gethostbyname_ex("thc-lab.net")[2][0]
+    data2 = socket.gethostbyname_ex("home.thc-lab.net")[2][0]
+    total = [data1, data2]
     ips = []
 
     for thing in total:
@@ -35,10 +35,10 @@ def secCheck(address):
         else:
             ips.append(check)
 
-    if address in ips:
-        return True
-    else:
-        return False
+        if address in ips:
+            return True
+        else:
+            return False
 
 
 @blueprint.route('/art.html', methods=['POST'])
