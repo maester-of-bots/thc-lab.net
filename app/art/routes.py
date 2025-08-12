@@ -45,16 +45,12 @@ def secCheck(address):
 def art_post():
     result = request.form
 
-    data = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
+    # data = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
 
-    ip = request.headers.get('X-Real-IP') or request.remote_addr
+    # ip = request.headers.get('X-Real-IP') or request.remote_addr
 
-    print(ip)
-
-    print("Gay")
-    print(request.headers)
-
-    if secCheck(data) and result['code'] == 'Yesbecausethisissecure101$':
+    # if secCheck(data) and result['code'] == 'Yesbecausethisissecure101$':
+    if result['code'] == 'Yesbecausethisissecure101$':
 
         url = result['url']
 
@@ -76,36 +72,7 @@ def art_post():
 
         return newpath
 
-    else:
-        print(result['code'])
-        return result['code']#"Hey, you're not THC!"
-
-
-# curl -v --unix-socket /var/www/thc-lab.net/main.sock http://localhost/variation.html -d 'code=fuck you you fucking fuck&url=https://www.telegraph.co.uk/content/dam/briefs/2025/07/22/TELEMMGLPICT000433194960_17531961502390_trans_NvBQzQNjv4Bq8VAndPZ2Bz0AY_iRYVPZ5P4Xpit_DMGvdp2n7FDd82k.jpeg?imwidth=1280'
-
-
-@blueprint.route('/variation.html', methods=['POST'])
-def variation():
-
-    result = request.form
-
-    print("Got a request.")
-
-    data = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
-    print("Grabbed the data.")
-
-    print(result['code'])
-
-    print(data)
-
-    print("Fuck you SecCheck")
-
-    request_data = secCheck(data)
-
-    if request_data and result['code'] == 'fuck you you fucking fuck':
-
-        print("We can respond.")
-
+    elif result['code'] == 'fuck you you fucking fuck':
         AI = oldOpenAI()
 
         new_urls = AI.variation(result['url'])
@@ -113,14 +80,10 @@ def variation():
 
         return "\n".join(new_urls)
 
-    elif request_data is False:
-
-        print("SecCheck failed.")
-        return "Bad IP."
-
     else:
-        print("Bad Peen.")
-        return "Bad peen!"
+        print(result['code'])
+        return f"Hey, you're not THC! - {result['code']}"
+
 
 @blueprint.route('static/uploads/backgrounds/<filename>')
 def display_background(filename):
