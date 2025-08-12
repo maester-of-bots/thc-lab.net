@@ -16,6 +16,7 @@ def allowed_file(filename):
 
 
 def secCheck(address):
+    print(address)
     data1 = socket.gethostbyname_ex("thc-lab.net")[2][0]
     data2 = socket.gethostbyname_ex("home.thc-lab.net")[2][0]
     total = [data1, data2]
