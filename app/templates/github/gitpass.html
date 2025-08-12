@@ -1,0 +1,19 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+
+<div class="container">
+
+{% if userData %}
+<h1><span>{{userData}}</span></h1>
+{% else %}
+    <div class="jumbotron text-center text-primary">
+        <h1><span class="fa fa-github"></span> Github OAuth</h1>
+        <p>Authorize your app with:</p>
+        <a href="https://github.com/login/oauth/authorize?client_id=Iv1.f1c59d20ae56b787&scope=public_repo" class="btn btn-danger"><span class="fa fa-github"></span> Github Login</a>
+    </div>
+{% endif %}
+
+</div>
+
+{% endblock content %}
