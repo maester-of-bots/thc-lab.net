@@ -93,13 +93,15 @@ def variation():
     data = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
     print("Grabbed the data.")
 
-    print(result)
+    print(result['code'])
 
     print(data)
 
     print("Fuck you SecCheck")
 
-    if secCheck(data) and result['code'] == 'fuck you you fucking fuck':
+    request_data = secCheck(data)
+
+    if request_data and result['code'] == 'fuck you you fucking fuck':
 
         print("We can respond.")
 
@@ -110,7 +112,7 @@ def variation():
 
         return "\n".join(new_urls)
 
-    elif not secCheck(data):
+    elif request_data is False:
 
         print("SecCheck failed.")
         return "Bad IP."
