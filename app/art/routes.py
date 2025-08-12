@@ -48,6 +48,8 @@ def art_post():
 
     data = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
 
+    print(data)
+
     if secCheck(data) and result['code'] == 'Yesbecausethisissecure101$':
 
         url = result['url']
@@ -88,7 +90,11 @@ def variation():
     data = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
     print("Grabbed the data.")
 
+    print(result)
+
     print(data)
+
+    print("Fuck you SecCheck")
 
     if secCheck(data) and result['code'] == 'fuck you you fucking fuck':
 
