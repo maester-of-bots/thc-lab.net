@@ -6,16 +6,7 @@ Copyright (c) 2019 - present AppSeed.us
 import os
 import random
 import string
-from decouple import config
 from dotenv import load_dotenv
-
-DATABASE_URI = config("DATABASE_URL")
-if DATABASE_URI.startswith("postgres://"):
-    DATABASE_URI = DATABASE_URI.replace("postgres://", "postgresql://", 1)
-
-
-
-
 
 class Config(object):
     basedir = os.path.abspath(os.path.dirname(__file__))
@@ -23,8 +14,6 @@ class Config(object):
     DEBUG = False
     TESTING = False
     CSRF_ENABLED = True
-    SQLALCHEMY_DATABASE_URI = DATABASE_URI
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
     UPLOAD_FOLDER = 'app/static/uploads/'
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024
 
@@ -37,44 +26,6 @@ class Config(object):
 
     # CDN Support Settings
     CDN_DOMAIN = os.getenv('CDN_DOMAIN', None)
-
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
-
-    DB_ENGINE = os.getenv('DB_ENGINE', None)
-    DB_USERNAME = os.getenv('DB_USERNAME', None)
-    DB_PASS = os.getenv('DB_PASS', None)
-    DB_HOST = os.getenv('DB_HOST', None)
-    DB_PORT = os.getenv('DB_PORT', None)
-    DB_NAME = os.getenv('DB_NAME', None)
-
-    USE_SQLITE = True
-
-    # try to set up a Relational DBMS
-    if DB_ENGINE and DB_NAME and DB_USERNAME:
-
-        try:
-
-            # Relational DBMS: PSQL, MySql
-            SQLALCHEMY_DATABASE_URI = '{}://{}:{}@{}:{}/{}'.format(
-                DB_ENGINE,
-                DB_USERNAME,
-                DB_PASS,
-                DB_HOST,
-                DB_PORT,
-                DB_NAME
-            )
-
-            USE_SQLITE = False
-
-        except Exception as e:
-
-            print('> Error: DBMS Exception: ' + str(e))
-            print('> Fallback to SQLite ')
-
-    if USE_SQLITE:
-        # This will create a file in <app> FOLDER
-        SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'db.sqlite3')
-
 
 class DevelopmentConfig(Config):
     DEVELOPMENT = True

@@ -1,33 +1,90 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} THC Home {% endblock %}
+    {% block content %}
 
-<!-- Element injected in the BODY element -->
-{% block body_class %} sidebar-mini {% endblock body_class %}
+    <div class="cube-wrapper">
+      <div data-w-id="c34fa755-3ae2-4117-33c9-911a04538d3f" style="-webkit-transform:translate3d(0, 0%, 0) scale3d(0, 0, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 0%, 0) scale3d(0, 0, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 0%, 0) scale3d(0, 0, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 0%, 0) scale3d(0, 0, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)" class="floating-block">
+        <div class="cube-top">
+          <div class="cube-top-svg w-embed"><svg viewbox="0 0 1400 218">
+              <path d="M140 0h1120l140 218H0z" fill="none" stroke="currentColor"></path>
+            </svg></div>
+        </div>
+        <div class="block-content">
+          <div class="block-title-wrapper">
+            <h4 class="block-title">THC's Lab - A Random Utility Toolbox</h4>
+          </div>
 
-{% block content %}
-
-<div class="content-wrapper">
-
-    <!-- Content Header (Page header) -->
-    <div class="content-header">
-        <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-sm-6">
-				Hi, welcome to my tiny corner of the internet.  I upload random projects on here intermittantly.  <br>
-
-
-                    Here's an endorsement for MX GuardDog that will get me free tokens:<br/><br/>
-                    Use MXGuardDog for a <a href="http://www.mxguarddog.com/exchange">free spam filter</a>. Don't judge
-                    them for how weird their promotion hyperlinks are.
-                </div>
+        </div>
+      </div>
+      <div class="static-cube">
+        <div data-w-id="0b0a1bf1-798c-ef75-b285-9a1f4835e31e" style="-webkit-transform:translate3d(0, 100%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 100%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 100%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 100%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);opacity:0" class="block-wrapper">
+          <div class="static-block">
+            <div class="cube-top">
+              <div class="cube-top-svg w-embed"><svg viewbox="0 0 1400 218">
+                  <path d="M140 0h1120l140 218H0z" fill="none" stroke="currentColor"></path>
+                </svg></div>
             </div>
+            <div class="block-content">
+              <div class="block-title-wrapper">
+                <div class="block-client">
+                  <h4 class="block-title">Title</h4>
+                </div>
+                <div class="block-year">
+                  <h4 class="block-title">Status</h4>
+                </div>
+                <div class="block-type">
+                  <h4 class="block-title">Description</h4>
+                </div>
+              </div>
+              <div class="block-actions-wrapper">
+                <div class="icon muted w-embed"><svg viewbox="0 0 25 25">
+                    <g fill="none" fill-rule="evenodd" stroke="currentColor" stroke-width="2">
+                      <circle cx="9" cy="9" r="8"></circle>
+                      <path stroke-linecap="square" d="M15 15l8 8"></path>
+                    </g>
+                  </svg></div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <!-- /.col -->
+        {% for block in data %}
+        <div data-w-id="beb3c370-439b-4b17-2cb4-661a0ec8dc46" style="-webkit-transform:translate3d(0, 100%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 100%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 100%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 100%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);opacity:0" class="block-wrapper">
+          <div class="static-block">
+            <a href="{{block['Link']}}" class="block-content w-inline-block">
+              <div class="block-title-wrapper">
+                <div class="block-client">
+                  <h4 class="block-title">{{block['Title']}}</h4>
+                </div>
+                <div class="block-year">
+                  <h4 class="block-title">{{block['Status']}}</h4>
+                </div>
+                <div class="block-type">
+                  <h4 class="block-title">{{block['Description']}}</h4>
+                </div>
+              </div>
+              {% if block['Status'] != "Coming Soon" %}
+              <div class="block-actions-wrapper">
+                <div class="icon w-embed"><svg viewbox="0 0 25 25">
+                    <path d="M0 13.486h21.178l-9.602 9.591 1.413 1.412L23.591 13.9l.001.001L25 12.496l-.002-.002H25l-1.413-1.412h-.002L12.989.5l-1.407 1.406 9.596 9.584H0v1.996z" fill="currentColor" fill-rule="evenodd"></path>
+                  </svg></div>
+              </div>
+              {% endif %}
+            </a>
+          </div>
+        </div>
+        {% endfor %}
+        <div data-w-id="d85f1c11-5c10-803c-cb74-9a0864d161e5" style="-webkit-transform:translate3d(0, 100%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 100%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 100%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 100%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);opacity:0" class="block-wrapper">
+          <div class="static-block">
+            <a href="#home" class="block-content empty w-inline-block">
+              <div class="block-actions-wrapper">
+                <div class="icon up w-embed"><svg viewbox="0 0 25 25">
+                    <path d="M0 13.486h21.178l-9.602 9.591 1.413 1.412L23.591 13.9l.001.001L25 12.496l-.002-.002H25l-1.413-1.412h-.002L12.989.5l-1.407 1.406 9.596 9.584H0v1.996z" fill="currentColor" fill-rule="evenodd"></path>
+                  </svg></div>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
-</div>
-
-{% endblock content %}
-
-<!-- Specific Page JS goes HERE  -->
+    {% endblock content %}

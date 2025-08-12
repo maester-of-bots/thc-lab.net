@@ -1,0 +1,9 @@
+DROP TABLE IF EXISTS urls;
+
+CREATE TABLE urls (
+    id SERIAL PRIMARY KEY,
+    created TIMESTAMP NOT NULL DEFAULT NOW(),
+    original_url TEXT NOT NULL,
+    clicks INTEGER NOT NULL DEFAULT 0,
+    base TEXT NOT NULL
+);

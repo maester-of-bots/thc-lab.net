@@ -1,4 +1,54 @@
 {% extends "layouts/base.html" %}
+{% block stylesheets %}
+
+<style>
+    .containerx {
+        display: flex;
+    }
+    .left-columnx {
+        padding: 10px;
+        border: 1px solid green;
+        }
+   h1 {
+      text-align: center;
+    }
+   h3 {
+      text-align: center;
+    }
+    .right-columnx {
+        flex: 70%;
+        padding: 10px;
+        border: 1px solid green;
+
+    }
+    .button-form {
+            margin-bottom: 10px;
+        }
+        input[type=submit] {
+            width: 100%;
+            height: 50px;
+            font-size: 18px;
+            background-color: limegreen;
+            color: black;
+            border: none;
+        }
+        input[type=submit]:hover {
+            background-color: darkgreen;
+            color: white;
+        }
+
+    .button {
+            width: 100%;
+            height: 50px;
+            font-size: 18px;
+            background-color: limegreen;
+            color: black;
+            border: none;
+        }
+
+
+</style>
+{% endblock stylesheets %}
 
 {% block title %} Bad Ape {% endblock %}
 
@@ -7,125 +57,57 @@
 
 
 {% block content %}
+
+
 <div class="content-wrapper">
 
-	<div class="content-header">
-		<div class="container-fluid">
 
-        <div class="row">
-          <div class="col-lg-3 col-6">
-            <!-- small box -->
-            <div class="small-box bg-info">
-              <div class="inner">
-                <h3>For Kids</h3>
-                  <form method="POST" action="/pass.html">
-                    <button class="button" name="kids" type="submit" style="vertical-align:middle">
-					<span STYLE="font-size: 10pt"><br/>
-						({{kid_count}} possible passwords!)
-					</span>
-                    </button>
-                  </form>
-              </div>
-              <div class="icon">
-                <i class="ion ion-stats-bars"></i>
-              </div>
-            </div>
-          </div>
-
-
-          <div class="col-lg-3 col-6">
-            <!-- small box -->
-            <div class="small-box bg-info">
-              <div class="inner">
-                <h3>For Teens</h3>
-                  <form method="POST" action="/pass.html">
-                    <button class="button" name="teens" type="submit" style="vertical-align:middle">
-					<span STYLE="font-size: 10pt"><br/>
-						({{teen_count}} possible passwords!)
-					</span>
-                    </button>
-                  </form>
-              </div>
-              <div class="icon">
-                <i class="ion ion-stats-bars"></i>
-              </div>
-            </div>
-          </div>
-
-
-          <div class="col-lg-3 col-6">
-            <!-- small box -->
-            <div class="small-box bg-info">
-              <div class="inner">
-                <h3>For Work</h3>
-                  <form method="POST" action="/pass.html">
-                    <button class="button" name="adults" type="submit" style="vertical-align:middle">
-					<span STYLE="font-size: 10pt"><br/>
-						({{adult_count}} possible passwords!)
-					</span>
-                    </button>
-                  </form>
-              </div>
-              <div class="icon">
-                <i class="ion ion-stats-bars"></i>
-              </div>
-            </div>
-          </div>
-
-
-          <div class="col-lg-3 col-6">
-            <!-- small box -->
-            <div class="small-box bg-info">
-              <div class="inner">
-                <h3>Swears</h3>
-                  <form method="POST" action="/pass.html">
-                    <button class="button" name="swears" type="submit" style="vertical-align:middle">
-					<span STYLE="font-size: 10pt"><br/>
-						({{swear_count}} possible passwords!)
-					</span>
-                    </button>
-                  </form>
-              </div>
-              <div class="icon">
-                <i class="ion ion-stats-bars"></i>
-              </div>
-            </div>
-          </div>
-
-
-          <div class="col-lg-3 col-6">
-            <!-- small box -->
-            <div class="small-box bg-info">
-              <div class="inner">
-                <h3>Adult - 18+</h3>
-                  <form method="POST" action="/pass.html">
-                    <button class="button" name="sex" type="submit" style="vertical-align:middle">
-					<span STYLE="font-size: 10pt"><br/>
-						({{xxx_count}} possible passwords!)
-					</span>
-                    </button>
-                  </form>
-              </div>
-              <div class="icon">
-                <i class="ion ion-stats-bars"></i>
-              </div>
-            </div>
-          </div>
-          <!-- ./col -->
+    <div class="containerx">
+        <h1>Generic Password Generator</h1>
+        <div class="left-columnx">
+            <form action="/pass.html" class="button-form" method="post">
+                <input name="kids" type="hidden" value="kids">
+                <input type="submit" value="For Kids">
+            </form>
+            <form action="/pass.html" class="button-form" method="post">
+                <input name="teens" type="hidden" value="teens">
+                <input type="submit" value="For Teens">
+            </form>
+            <form action="/pass.html" class="button-form" method="post">
+                <input name="adults" type="hidden" value="adults">
+                <input type="submit" value="For Adults">
+            </form>
+            <form action="/pass.html" class="button-form" method="post">
+                <input name="swears" type="hidden" value="swears">
+                <input type="submit" value="Swears">
+            </form>
         </div>
+        <br><br><br>
+        <div class="right-columnx">
+            {% if password %}
+            <h1><span>{{ password }}</span></h1>
+            <h3><span>({{plaintext}})</span></h3>
+            <br/>
 
+            <button id="btn" class="button">Copy</button>
+            <script>
+                    const btn = document.getElementById('btn');
 
-        <div class="row">
-          <div class="col-md-8">
+                    btn.addEventListener('click', function handleClick() {
+                      btn.textContent = 'Copied!';
+                    });
 
-            <span id="pass" class="info">{{password}}</span>
-            <br/><br/><br/><br/>
-            <span id="plain" class="info2">({{plaintext}})</span>
+                    navigator.clipboard.writeText
+                        ("{{ password }}")
+
+            </script>
             <br/><br/>
             <div>{{previous}}</div>
-          </div>
-            </div>
-            </div>
+            {% endif %}
+
         </div>
     </div>
-{% endblock %}
+    </div>
+
+
+    {% endblock %}

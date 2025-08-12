@@ -1,10 +1,11 @@
 from flask import Blueprint, request, render_template, redirect, flash, url_for
 from hashids import Hashids
-
+import random
 from modules.sql import *
 
 from dotenv import load_dotenv
 from app.shorts import blueprint
+
 
 shorts = Blueprint('shorts', __name__)
 load_dotenv()
@@ -21,10 +22,13 @@ def shorts():
             flash('The URL is required!')
             return redirect(url_for('shorts'))
         else:
+            if "http" not in url.lower():
+                url = "http://" + url
 
-            DB.post_url(url)
+            DB.post_url(url, 'beta.thc-lab.net')
 
-            url_id = DB.get_url(url)[0]
+            url_id = DB.get_url(url, 'beta.thc-lab.net')[0]
+            print(url_id)
             hashid = hashids.encode(url_id)
             short_url = request.host_url + hashid
 
@@ -42,6 +46,7 @@ def shorts():
                                image_url="image.jpg")
 
 
+
 @blueprint.route('/<id>')
 def url_redirect(id):
 
@@ -49,7 +54,7 @@ def url_redirect(id):
 
     if temp_url:
         temp_url2 = temp_url[0]
-        original_url = DB.get_url_for_redirect(temp_url2)
+        original_url = DB.get_url_for_redirect(temp_url2, 'beta.thc-lab.net')
         return redirect(original_url)
 
     else:

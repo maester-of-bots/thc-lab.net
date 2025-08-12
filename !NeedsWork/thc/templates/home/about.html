@@ -1,0 +1,121 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} {{ tab_title }}  {% endblock %}
+
+<!-- Element injected in the BODY element -->
+{% block body_class %} sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed {% endblock body_class %}
+
+
+{% block content %}
+
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0 text-dark">{{main_title}}</h1>
+                </div><!-- /.col -->
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        <li class="breadcrumb-item active">{{sub_home_name}}</li>
+                    </ol>
+                </div><!-- /.col -->
+            </div><!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
+
+    <!-- Main content -->
+    <section class="content">
+
+        <div class="container-fluid">
+
+            <!-- Info boxes -->
+            <div class="row">
+                <p>
+                    Hi there, I'm THC. I've been making random stuff with Python for a few years, getting semi-good at
+                    it.
+                </p><br><br>
+            </div>
+            <div class="row">
+                <h1>Stuff I Like</h1>
+              <br><br>
+                <p>
+                    <a href="https://m.do.co/c/ed4158cf2c05">Digital Ocean</a> for a cheap VPS. That's a referral link,
+                    we both get points or something if you sign up with it. Azure and AWS are more prevalent in the
+                    business world, but heck...DigitalOcean is smaller, similarly priced, they've got lots of nice
+                    How-To docs. I've been hosting with them for at least five years. Super solid platform. <br/><br/>
+
+                    MXGuardDog is an awesome free <a href="http://www.mxguarddog.com/">anti spam software</a>. Basically
+                    free if you copy their ad code into your site. <i>Anywhere</i> on your site, even the 404 page or
+                    something random. Weird, but that didn't stop my 404 page from having scammy ads for diamonds for a
+                    few years to rack up like a decade of free service.<br/><br/>
+
+                    <a href="https://www.amazon.com/gp/product/B08FT1SFKY">Synology</a> as a NAS. They work flawlessly
+                    and require minimal configuration, but there's endless cool techy things you can do if you're so
+                    inclined. Don't be cheap, get the five-bay.<br/><br/>
+
+                    <a href="https://www.office.com/">Office365</a> over Google Apps / G-Suite / Whatever they're called
+                    now for a $10/month cloud mail solution. Google took away my unlimited storage, I took away my $10 a
+                    month! I don't have any huge benefits for Office365 besides getting five free Office
+                    licenses!<br/><br/>
+
+                    <a href="https://www.microsoft.com/en-us/software-download/windows10">Windows 10</a> for a desktop
+                    OS. MacOS makes my head hurt, not a huge fan of Windows 11.<br/><br/>
+
+                    <a href="https://www.redhat.com/en/technologies/linux-platforms/enterprise-linux">RHEL</a> generally
+                    for server operating systems. Lightweight, speedy, cheap.<br/><br/>
+
+                    <a href="https://www.vmware.com/products/esxi-and-esx.html">ESXI</a> for baremetal hypervisors.<br/><br/>
+
+                    <a href="https://www.apple.com/iphone/">iPhone</a> over Android. iPhones are nice and neat and
+                    standard, it's nice to not have to worry about my phone's general functionality on a day to day
+                    basis. I broke Android phones a lot.<br/><br/>
+                </p>
+            </div>
+            <div class="row">
+                <h1>Donation Sites</h1>
+                    </div>
+            <div class="row">
+
+                <script data-coffee-color="#ffffff" data-color="#FFDD00"
+                    data-emoji="" data-font="Cookie" data-font-color="#000000" data-name="bmc-button" data-outline-color="#000000"
+                    data-slug="SOBERLab" data-text="Buy me a cloud server" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
+                    type="text/javascript"></script>
+            <br><br>
+                    </div>
+        <div class="row">
+
+            <div class='fiverr-seller-widget' itemscope itemtype='http://schema.org/Person'
+                 style='display: inline-block;'>
+                <a href=https://www.fiverr.com/zomgpython itemprop='url' rel="nofollow" style='display: inline-block;'
+                   target="_blank">
+                    <div class='fiverr-seller-content'
+                         id='fiverr-seller-widget-content-049256c8-6228-40cf-a905-c0d37ffbbfd1' itemprop='contentURL'
+                         style='display: none;'></div>
+                    <div id='fiverr-widget-seller-data' style='display: none;'>
+                        <div itemprop='name'>zomgpython</div>
+                        <div itemscope itemtype='http://schema.org/Organization'><span itemprop='name'>Fiverr</span>
+                        </div>
+                        <div itemprop='jobtitle'>Maester of Bots</div>
+                        <div itemprop='description'>Long time sysadmin, homelab / Python enthusiast. Love making bots,
+                            helping design custom solutions for random needs, encouraging learning and business process
+                            improvement!
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <script async='true'
+                    data-config='{"category_name":"Programming \u0026 Tech"}'
+                    defer='true' id='fiverr-seller-widget-script-049256c8-6228-40cf-a905-c0d37ffbbfd1' src='https://widgets.fiverr.com/api/v1/seller/zomgpython?widget_id=049256c8-6228-40cf-a905-c0d37ffbbfd1'></script>
+
+            </div>
+
+        </div>
+
+    </section>
+</div>
+{% endblock content %}

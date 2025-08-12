@@ -1,45 +1,81 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} Bad Ape {% endblock %}
+{% block stylesheets %}
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f2f2f2;
+    text-align: center;
+    padding: 50px;
+}
+.container {
+    background-color: white;
+    width: 400px;
+    margin: 0 auto;
+    color: #333;
+    padding: 20px;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+}
+h2 {
+    color: #333;
+}
+input[type="text"] {
+    width: 80%;
+    padding: 12px 20px;
+    margin: 8px 0;
+      color: #333;
 
-<!-- Element injected in the BODY element -->
-{% block body_class %} sidebar-mini {% endblock body_class %}
+    display: inline-block;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    cursor: pointer;
+    width: 80%;
+}
+button:hover {
+    opacity: 0.8;
+}
+
+{% endblock stylesheets %}
 
 {% block content %}
-<div class="content-wrapper">
-
-	<div class="content-header">
-		<div class="container-fluid">
 
 
-    <form method="post">
-    <div class="form-group">
-        <label for="url">URL</label>
-        <input type="text" name="url"
-               placeholder="URL to shorten" class="form-control"
-               value="{{ request.form['url'] }}" autofocus></input>
+<div class="container">
+        <h2>URL Shortener</h2>
+
+            <form method="post">
+                <input type="text" name="url" class="form-control"
+                       value="{{ request.form['url'] }}" autofocus/>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
     </div>
-
-    <div class="form-group">
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </div>
-    </form>
+<br><br><br>
 
 
-    {% if short_url %}
-     <h1><span >{{ short_url }}</span></h1>
-    <button id="btn">Copy URL</button>
-    <script>
-        const btn = document.getElementById('btn');
+{% if short_url %}
+<div class="container" onclick="copyToClipboard(this)">
+    <h3>Click to copy</h3>
+    <span id="shortUrlText">{{ short_url }}</span>
+</div>
 
-        btn.addEventListener('click', function handleClick() {
-          btn.textContent = 'Copied!';
-        });
+{% endif %}
 
-        navigator.clipboard.writeText
-            ("{{ short_url }}")
-    </script>
-    {% endif %}
+<script>
+    function copyToClipboard(element) {
+    var text = element.textContent || element.innerText;  // Get the text content
+    navigator.clipboard.writeText(text).then(function() {
+        console.log('Text copied to clipboard');
+    }).catch(function(err) {
+        console.error('Could not copy text: ', err);
+    });
+}
 
-        </div></div></div>
+</script>
+
 {% endblock %}

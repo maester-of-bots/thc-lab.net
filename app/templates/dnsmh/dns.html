@@ -1,0 +1,33 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<div class="static-block">
+    <div class="block-title-wrapper">
+
+        <div class="block-content">
+            <form method="post">
+                <label for="domain">Domain Name</label>
+                <input type="text" name="domain" class="form-control" autofocus/>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% if data %}
+<div class="static-block">
+    <div class="block-title-wrapper">
+
+        <div class="block-content">
+            {% for thing in data['data'] %}
+            {{thing}} - {{data['data'][thing]}}
+            {% endfor %}
+
+        </div>
+{% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

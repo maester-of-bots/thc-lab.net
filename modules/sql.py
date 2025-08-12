@@ -1,6 +1,4 @@
 import psycopg2
-from datetime import *
-import random
 import os
 from dotenv import load_dotenv
 import psycopg2.extras
@@ -16,9 +14,8 @@ class db:
         self.database = os.getenv('cloud_db-db')
         self.sslmode = os.getenv('cloud_db-ssl')
 
-        # self.drop_table('openai_usage')
-
-
+        self.table = "urls"
+        self.column = "original_url, base"
 
     def get_db(self):
         # connect to MySQL server
@@ -27,75 +24,44 @@ class db:
             user=self.user,
             password=self.password,
             host=self.server,
-            port=self.port,)
-            #sslmode='require')
-
+            port=self.port,
+            sslmode=self.sslmode)
         return conn
 
 
-    def post_url(self, url):
-        table = "urls_thc"
-        column = "original_url"
+    def post_url(self, url, domain):
+        """ Post the URL to the database, generating an ID which we'll refer back to"""
 
-        if self.get_url(url):
+        if self.get_url(url, domain):
             pass
         else:
             conn = self.get_db()
             cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
-            cur.execute(f"INSERT INTO {table} ({column}) VALUES ('{url}')")
+            cur.execute(f"INSERT INTO {self.table} ({self.column}) VALUES ('{url}', '{domain}')")
             conn.commit()
             cur.close()
             conn.close()
 
-    def get_url(self, url):
+    def get_url(self, url, domain):
         conn = self.get_db()
         cur = conn.cursor()
-        cur.execute(f"SELECT * FROM urls_thc WHERE original_url LIKE '{url}'")
+        cur.execute(f"SELECT * FROM {self.table} WHERE original_url LIKE '{url}' AND base LIKE '{domain}'")
         result = cur.fetchone()
         cur.close()
         conn.close()
         return result
 
-    def get_url_for_redirect(self,original_id):
-
+    def get_url_for_redirect(self,original_id, domain):
         conn = self.get_db()
         cur = conn.cursor()
-
-        cur.execute(f"SELECT original_url, clicks FROM urls_thc WHERE id = ('{original_id}')")
-
+        cur.execute(f"SELECT original_url, clicks FROM {self.table} WHERE id = '{original_id}' AND base LIKE '{domain}'")
         data = cur.fetchone()
         url_to_return = data[0]
         clicks = data[1]
-
-        cur.execute(f"UPDATE urls_thc SET clicks = {clicks+1} WHERE id = {original_id}")
-
+        cur.execute(f"UPDATE {self.table} SET clicks = {clicks+1} WHERE id = {original_id} AND base LIKE '{domain}'")
         conn.commit()
         conn.close()
         return url_to_return
-
-
-    def dump_info(self, table, bot_dict):
-        conn = self.get_db()
-        cur = conn.cursor()
-
-        columns = ", ".join(bot_dict.keys())
-
-        vals = ", ".join(["%s"]*len(bot_dict.keys()))
-
-        cur.execute(f"INSERT INTO {table} ({columns}) VALUES ({vals})", tuple(bot_dict.values()))
-        conn.commit()
-        # Close communication with the database
-        cur.close()
-        conn.close()
-
-    def get_info(self, table):
-        conn = self.get_db()
-        cur = conn.cursor()
-        cur.execute(f"SELECT * FROM {table}")
-        result = cur.fetchall()
-        cur.close()
-        conn.close()
-        return result
 
 DB=db()

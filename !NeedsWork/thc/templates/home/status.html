@@ -1,0 +1,139 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} {{ tab_title }}  {% endblock %}
+
+<!-- Element injected in the BODY element -->
+{% block body_class %} sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed {% endblock body_class %}
+
+
+{% block content %}
+
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0 text-dark">{{main_title}}</h1>
+                </div><!-- /.col -->
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        <li class="breadcrumb-item active">{{sub_home_name}}</li>
+                    </ol>
+                </div><!-- /.col -->
+            </div><!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
+
+    <!-- Main content -->
+    <section class="content">
+
+        <div class="container-fluid">
+
+            <!-- Info boxes -->
+            <div class="row">
+
+                <!-- fix for small devices only -->
+                <div class="clearfix hidden-md-up"></div>
+
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title">Reddit Bots [FreeFolk]</h5>
+                        </div>
+
+                        <div class="card-body">
+                            <a href="https://www.reddit.com/user/vizzy_t_bot"><img
+                                    src="https://healthchecks.io/badge/49a468d9-f385-47bb-8e67-5bb7b5637264/YCENiBq0-2/vizzy-t-bot.svg"></a><br><br>
+
+
+                        </div>
+                    </div>
+                    <!-- /.info-box -->
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title">Reddit Bots [SuperStore]</h5>
+                        </div>
+
+                        <div class="card-body">
+                            <a href="https://www.reddit.com/user/elias-feet-bot"><img
+                                    src="https://healthchecks.io/badge/49a468d9-f385-47bb-8e67-5bb7b5637264/-szOOB4I-2/Elias-Feet-Bot.svg"></a><br><br>
+                            <a href="https://www.reddit.com/user/g-spot-bot"><img
+                                    src="https://healthchecks.io/badge/49a468d9-f385-47bb-8e67-5bb7b5637264/0Hp9OV6t-2/G-Spot-Bot.svg"></a><br><br>
+
+
+
+                        </div>
+                    </div>
+                    <!-- /.info-box -->
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title">Reddit Bots [Other!]</h5>
+                        </div>
+
+                        <div class="card-body">
+                            <a href="https://www.reddit.com/user/KnightsOfHarambe"><img
+                                    src="https://healthchecks.io/badge/49a468d9-f385-47bb-8e67-5bb7b5637264/kj4C_T1l-2/KnightsOfHarambe.svg"></a><br><br>
+
+
+                        </div>
+                    </div>
+                    <!-- /.info-box -->
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title">Web</h5>
+                        </div>
+
+                        <div class="card-body">
+                            <a href="https://theriskiestbiscuit.wtf"><img
+                                    src="https://healthchecks.io/badge/3b030bee-35c5-4c20-b721-f77661b36762/2XVy0F_J-2/https%253A%252F%252Ftheriskiestbiscuit.wtf.svg"></a><br><br>
+                            <a href="https://vizzy-t.com"><img
+                                    src="https://healthchecks.io/badge/3b030bee-35c5-4c20-b721-f77661b36762/S66jfDbU-2/https%253A%252F%252Fvizzy-t.com.svg"></a><br><br>
+                            <a href="https://thc-lab.net"><img
+                                    src="https://healthchecks.io/badge/3b030bee-35c5-4c20-b721-f77661b36762/mqypBpFI-2/https%253A%252F%252Fthc-lab.net.svg"></a><br><br>
+                            <a href="https://dm.does.gb.net"><img
+                                    src="https://healthchecks.io/badge/3b030bee-35c5-4c20-b721-f77661b36762/en5uqkNc-2/https%253A%252F%252Fdm.does.gb.net.svg"></a><br><br><br>
+
+                        </div>
+                    </div>
+                    <!-- /.info-box -->
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title">Discord Bots</h5>
+                        </div>
+
+                        <div class="card-body">
+                            <img src="https://healthchecks.io/badge/4e37ed91-014d-46bb-bfd2-15e916fc0068/QC4jDTQZ-2/GoldiBot.svg">
+                            - SoapBoxBeers Bot<br><br>
+                            <img src="https://healthchecks.io/badge/4e37ed91-014d-46bb-bfd2-15e916fc0068/LlmtHrMR-2/TGS-Bot-Admin.svg">
+                            - General administrative bot<br><br>
+                            <img src="https://healthchecks.io/badge/4e37ed91-014d-46bb-bfd2-15e916fc0068/3aUzz-4k-2/TGS-Bot-DiscordBuddy.svg">
+                            - THC's bot<br><br>
+                            <img src="https://healthchecks.io/badge/4e37ed91-014d-46bb-bfd2-15e916fc0068/4pke_PtK-2/TGS-Bot-FreeFolkDiscord.svg">
+                            - Quotebot for FreeFolkSimulator server<br><br><br>
+
+                        </div>
+                    </div>
+                    <!-- /.info-box -->
+                </div>
+
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock content %}
