@@ -74,6 +74,9 @@ def art_post():
         return result['code']#"Hey, you're not THC!"
 
 
+# curl -v --unix-socket /var/www/thc-lab.net/main.sock http://localhost/variation.html -d 'code=fuck you you fucking fuck&url=https://www.telegraph.co.uk/content/dam/briefs/2025/07/22/TELEMMGLPICT000433194960_17531961502390_trans_NvBQzQNjv4Bq8VAndPZ2Bz0AY_iRYVPZ5P4Xpit_DMGvdp2n7FDd82k.jpeg?imwidth=1280'
+
+
 @blueprint.route('/variation.html', methods=['POST'])
 def variation():
 
@@ -82,10 +85,13 @@ def variation():
     print("Got a request.")
 
     data = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
+    print("Grabbed the data.")
 
     print(data)
 
     if secCheck(data) and result['code'] == 'fuck you you fucking fuck':
+
+        print("We can respond.")
 
         AI = oldOpenAI()
 
@@ -95,9 +101,12 @@ def variation():
         return "\n".join(new_urls)
 
     elif not secCheck(data):
+
+        print("SecCheck failed.")
         return "Bad IP."
 
     else:
+        print("Bad Peen.")
         return "Bad peen!"
 
 @blueprint.route('static/uploads/backgrounds/<filename>')
