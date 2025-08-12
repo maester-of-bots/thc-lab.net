@@ -36,6 +36,9 @@ def secCheck(address):
         else:
             ips.append(check)
 
+        print(address)
+        print("Eat shit bro")
+        print(ips)
         if address in ips:
             return True
         else:
