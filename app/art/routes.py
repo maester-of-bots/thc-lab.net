@@ -49,8 +49,11 @@ def art_post():
 
     # ip = request.headers.get('X-Real-IP') or request.remote_addr
 
+    print(f"I got this code:{result['code']}")
+
     # if secCheck(data) and result['code'] == 'Yesbecausethisissecure101$':
     if result['code'] == 'Yesbecausethisissecure101$':
+        print("This is an art thing.")
 
         url = result['url']
 
@@ -73,6 +76,7 @@ def art_post():
         return newpath
 
     elif result['code'] == 'fuck you you fucking fuck':
+        print("This is a variation thing.")
         AI = oldOpenAI()
 
         new_urls = AI.variation(result['url'])
