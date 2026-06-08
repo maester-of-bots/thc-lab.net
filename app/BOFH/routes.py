@@ -1,7 +1,8 @@
 import json
 import os
+import random
 
-from flask import Blueprint
+from flask import Blueprint, render_template
 
 from app.BOFH import blueprint
 
