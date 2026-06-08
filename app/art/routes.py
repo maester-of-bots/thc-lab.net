@@ -1,5 +1,3 @@
-from app.art.variations import *
-
 from flask import Blueprint, request, render_template, redirect, url_for
 import requests
 
@@ -74,15 +72,6 @@ def art_post():
             image.write(data.content)
 
         return newpath
-
-    elif result['code'] == 'fuck you you fucking fuck':
-        print("This is a variation thing.")
-        AI = oldOpenAI()
-
-        new_urls = AI.variation(result['url'])
-        print(new_urls)
-
-        return "\n".join(new_urls)
 
     else:
         print(result['code'])

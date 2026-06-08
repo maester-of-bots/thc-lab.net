@@ -1,0 +1,43 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<div class="static-block">
+    <div class="block-title-wrapper">
+        <div class="block-content">
+            <h4>Email Header Analyzer</h4>
+            <form method="post">
+                <div class="form-group">
+                    <label for="header">Paste raw email headers</label>
+                    <textarea name="header" class="form-control" rows="10" placeholder="Paste full email headers here..." autofocus></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Analyze</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% if result %}
+<div class="static-block">
+    <div class="block-content">
+        <table class="table table-bordered">
+            <tr><th>From</th><td>{{ result.from or '—' }}</td></tr>
+            <tr><th>To</th><td>{{ result.to or '—' }}</td></tr>
+            <tr><th>Subject</th><td>{{ result.subject or '—' }}</td></tr>
+            <tr><th>Date</th><td>{{ result.date or '—' }}</td></tr>
+            <tr><th>DKIM</th><td>{{ result.dkim or '—' }}</td></tr>
+            <tr><th>SPF</th><td>{{ result.spf or '—' }}</td></tr>
+            <tr><th>DMARC / Auth Results</th><td>{{ result.dmarc or '—' }}</td></tr>
+        </table>
+
+        {% if result.received %}
+        <h5>Routing Path</h5>
+        <ol>
+            {% for hop in result.received %}
+            <li><strong>{{ hop.server }}</strong> — {{ hop.ip }}</li>
+            {% endfor %}
+        </ol>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}

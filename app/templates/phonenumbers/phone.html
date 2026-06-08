@@ -1,0 +1,38 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<div class="static-block">
+    <div class="block-title-wrapper">
+        <div class="block-content">
+            <h4>Phone Number Lookup</h4>
+            <form method="post">
+                <div class="form-group">
+                    <label for="number">Phone Number (include country code, e.g. +14155552671)</label>
+                    <input type="text" name="number" class="form-control" placeholder="+14155552671" autofocus />
+                </div>
+                <button type="submit" class="btn btn-primary">Look Up</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% if error %}
+<div class="static-block">
+    <div class="block-content">
+        <div class="alert alert-danger">{{ error }}</div>
+    </div>
+</div>
+{% endif %}
+
+{% if result %}
+<div class="static-block">
+    <div class="block-content">
+        <table class="table table-bordered">
+            <tr><th>Number</th><td>{{ result.formatted }}</td></tr>
+            <tr><th>Region</th><td>{{ result.region or 'Unknown' }}</td></tr>
+            <tr><th>Carrier</th><td>{{ result.carrier or 'Unknown' }}</td></tr>
+        </table>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

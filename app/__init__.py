@@ -6,7 +6,8 @@ def create_app(config):
     app = Flask(__name__, static_url_path='/static')
     app.config.from_object(config)
 
-    modules = ['art', 'home','shorts','password_gen','BOFH','dnsmh', 'badape', 'github']
+    modules = ['art', 'home', 'shorts', 'password_gen', 'BOFH', 'dnsmh', 'badape', 'github',
+               'subnet_calculator', 'phonenumbers', 'emailsmh']
 
     with app.app_context():
 
