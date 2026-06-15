@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LOW BATTERY</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: #0c0b09;
+    font-family: Verdana, Geneva, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    user-select: none;
+  }
+  #stage {
+    position: relative;
+    width: min(96vw, calc(92vh * 16 / 9));
+    aspect-ratio: 16 / 9;
+    background: #000;
+    box-shadow: 0 0 60px rgba(0,0,0,0.9);
+  }
+  #scene { position: absolute; inset: 0; }
+  #scene svg { width: 100%; height: 100%; display: block; }
+  [data-obj] { cursor: pointer; }
+
+  /* navigation arrows */
+  .nav {
+    position: absolute;
+    background: none;
+    border: none;
+    color: rgba(235, 226, 205, 0.5);
+    font-size: clamp(22px, 4vw, 40px);
+    font-family: Verdana, sans-serif;
+    cursor: pointer;
+    padding: 14px;
+    z-index: 5;
+    text-shadow: 0 0 8px #000;
+  }
+  .nav:hover { color: rgba(235, 226, 205, 0.95); }
+  #navL { left: 0; top: 45%; }
+  #navR { right: 0; top: 45%; }
+  #navU { left: 50%; top: 0; transform: translateX(-50%); }
+  #navD { left: 50%; bottom: 13%; transform: translateX(-50%); }
+
+  /* caption bar */
+  #caption {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    min-height: 12%;
+    background: rgba(8, 7, 5, 0.92);
+    color: #d8cdb2;
+    font-size: clamp(11px, 1.6vw, 16px);
+    padding: 10px 18px;
+    line-height: 1.5;
+    z-index: 6;
+    border-top: 1px solid #2a261d;
+  }
+
+  /* inventory */
+  #inv {
+    position: absolute;
+    top: 10px; right: 10px;
+    width: 52px; height: 52px;
+    background: rgba(8,7,5,0.8);
+    border: 1px solid #3a3428;
+    z-index: 6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  #inv svg { width: 70%; height: 70%; }
+
+  /* dread layers */
+  #vignette {
+    position: absolute; inset: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,0.95) 130%);
+    opacity: 0;
+    transition: opacity 3s;
+    z-index: 4;
+  }
+  #flick {
+    position: absolute; inset: 0;
+    background: #000;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 7;
+  }
+
+  /* start screen */
+  #intro {
+    position: absolute; inset: 0;
+    background: #000;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #d8cdb2;
+    cursor: pointer;
+  }
+  #intro h1 {
+    font-size: clamp(20px, 4vw, 42px);
+    letter-spacing: 0.35em;
+    font-weight: normal;
+    margin: 0 0 14px 0;
+  }
+  #intro .sub { color: #6e6450; font-size: clamp(10px, 1.4vw, 14px); margin-bottom: 40px; }
+  #intro .enter { font-size: clamp(11px, 1.5vw, 15px); color: #9a8e72; animation: pulse 2.4s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity: 0.45; } 50% { opacity: 1; } }
+
+  /* second hand twitch */
+  @keyframes twitch {
+    0%, 88%, 100% { transform: rotate(204deg); }
+    90% { transform: rotate(206deg); }
+    93% { transform: rotate(203.5deg); }
+  }
+  #secHand { transform-origin: center; animation: twitch 2.2s infinite; }
+
+  @media (prefers-reduced-motion: reduce) {
+    #secHand { animation: none; }
+    #intro .enter { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<div id="stage">
+  <div id="scene"></div>
+  <button class="nav" id="navL" aria-label="turn left">&#9664;</button>
+  <button class="nav" id="navR" aria-label="turn right">&#9654;</button>
+  <button class="nav" id="navU" aria-label="look up">&#9650;</button>
+  <button class="nav" id="navD" aria-label="look down" style="display:none;">&#9660;</button>
+  <div id="inv" title=""></div>
+  <div id="vignette"></div>
+  <div id="flick"></div>
+  <div id="caption"></div>
+
+  <div id="intro">
+    <h1>LOW BATTERY</h1>
+    <div class="sub">a room</div>
+    <div class="enter">click to enter</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============================ STATE ============================ */
+  const S = {
+    facing: 0,            // 0 N, 1 E, 2 S, 3 W
+    up: false,
+    dread: 0,
+    counts: {},           // per-object interaction counts
+    open: {},             // per-view transient open states (drawers, fridge, etc.)
+    eastVisits: 0,        // drives the window
+    doorStage: 0,         // 0 door, 1 wall, 2 door again (openable)
+    chairMoved: false,
+    compOpen: false,
+    compDone: false,
+    hasAA: false,
+    aaTaken: false,
+    started: false
+  };
+  const WALLS = ["north", "east", "south", "west"];
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const sceneEl = document.getElementById('scene');
+  const captionEl = document.getElementById('caption');
+
+  function bump(k) {
+    S.counts[k] = (S.counts[k] || 0) + 1;
+    S.dread++;
+    onDread();
+    return S.counts[k];
+  }
+  function cnt(k) { return S.counts[k] || 0; }
+  function caption(t) { captionEl.textContent = t; }
+  function pick(arr, n) { return arr[Math.min(n - 1, arr.length - 1)]; }
+
+  /* ============================ MESSAGES ============================ */
+  const M = {
+    door: [
+      "The door is locked.",
+      "The door is locked. You do not remember locking it.",
+      "There is no keyhole. There is no knob, either, anymore."
+    ],
+    doorWall: [
+      "The door is a wall now. It seems happier.",
+      "It is load-bearing.",
+      "You knock. The wall does not."
+    ],
+    doorOpen: [
+      "It opens onto a room. Inside, a smoke detector is chirping.",
+      "The room inside has a door. It is closed.",
+      "You decide not to go in. The you inside decides the same."
+    ],
+    photo: [
+      "A framed photo. A family of four. You do not recognize them.",
+      "A family of three. They are smiling the same amount.",
+      "Two people. The photo is sun-faded in the shape of the others.",
+      "One person. They are looking up at something on the ceiling.",
+      "An empty room. You recognize this one."
+    ],
+    clock: [
+      "It is 3:34. The second hand is trying.",
+      "It is still 3:34. The second hand twitches like something dreaming.",
+      "The clock has thirteen numbers now. It is still 3:34.",
+      "Time is also out of batteries."
+    ],
+    window: [
+      "It is afternoon. The light is the color of weak tea.",
+      "It is evening. You only looked away for a moment.",
+      "It is night now. The streetlights have not come on.",
+      "There are no streetlights. There is no street.",
+      "Through the window you can see a room. Its ceiling has a smoke detector.",
+      "It is chirping out there, too."
+    ],
+    drawer1: [
+      "Takeout menus. No battery.",
+      "Takeout menus. They are all for the same restaurant.",
+      "The restaurant has no name. The phone number is your phone number."
+    ],
+    drawer2: [
+      "Empty. A clean rectangle in the dust, about the size of a 9-volt battery.",
+      "A battery was here once. The dust remembers it.",
+      "The rectangle is gone now. The dust is smooth, like it never knew anything."
+    ],
+    drawer3: [
+      "Pens. None of them are batteries.",
+      "The pens have no ink. They never had ink.",
+      "You close the drawer gently, so as not to wake the pens."
+    ],
+    mug: [
+      "Cold coffee. The mug says WORLD'S BEST. Best what, it does not say.",
+      "The coffee is colder than the room. That should not be possible.",
+      "The mug is empty now. You did not drink it."
+    ],
+    fridge: [
+      "Hum. A jar of something. The jar is labeled JAR.",
+      "The fridge light does not come on. The hum gets louder when you look directly at it.",
+      "It is warm inside. The hum is coming from somewhere else.",
+      "The jar is gone. The hum remains. The hum was never the fridge."
+    ],
+    cabinet: [
+      "Plates. Eleven plates. You count again. Eleven plates.",
+      "Ten plates.",
+      "The plates are facing the wall now.",
+      "You no longer open the cabinet. The cabinet understands."
+    ],
+    jar: [
+      "JAR.",
+      "The jar is empty in a way that suggests it was always empty.",
+      "Do not open the jar.",
+      "You do not open the jar."
+    ],
+    books: [
+      "Three books. The spines are blank.",
+      "The books are all the same book.",
+      "The book is about a room. You stop reading."
+    ],
+    couch: [
+      "You check under the cushions. Three coins. They are not batteries.",
+      "More coins. They are warm.",
+      "The cushions are damp. The coins are gone. You put them back? You don't remember taking them.",
+      "You do not check under the cushions again. Something under there agrees this is best."
+    ],
+    lamp: [
+      "You switch the lamp on. The room does not get brighter.",
+      "You switch the lamp off. The room does not get darker.",
+      "The lamp is neither on nor off now. Best to leave it."
+    ],
+    closet: [
+      "Coats. A broom. No batteries.",
+      "The coats are all the same coat.",
+      "One hanger is swinging. The closet was closed when it started.",
+      "You decide the closet is finished."
+    ],
+    chairEarly: [
+      "It is a chair.",
+      "A perfectly normal chair. Four legs. You count again. Four legs.",
+      "It is not tall enough to matter from here."
+    ],
+    sideDrawerEmpty: [
+      "Empty.",
+      "Still empty. The drawer slides out further than the table is deep.",
+      "You do not check how much further."
+    ],
+    fixture: [
+      "A dead bulb. Not a battery. A different kind of dead.",
+      "The bulb is warm.",
+      "You leave the bulb alone."
+    ],
+    ceiling: [
+      "The ceiling. It is closer than ceilings usually are.",
+      "You are sure it used to be higher."
+    ],
+    detectorFar: [
+      "The smoke detector. It is out of reach.",
+      "You stretch. It is still out of reach. It chirps, politely.",
+      "Perhaps if you stood on something."
+    ],
+    detectorDone: [
+      "It is closed now.",
+      "Chirp.",
+      "It will be fine."
+    ],
+    aa: [
+      "A battery. Your heart leaps.",
+      "It is a AA. The detector requires 9 volts. This is not that."
+    ],
+    invAA: [
+      "It is still not 9 volts.",
+      "You hold it anyway. It is something.",
+      "The AA is patient. It knows it is not needed. It stays."
+    ]
+  };
+
+  /* ============================ AUDIO ============================ */
+  let AC = null, panNode = null, humGain = null, droneGain = null;
+
+  function audioInit() {
+    try {
+      AC = new (window.AudioContext || window.webkitAudioContext)();
+
+      // room-tone drone: looped filtered noise
+      const len = AC.sampleRate * 2;
+      const buf = AC.createBuffer(1, len, AC.sampleRate);
+      const d = buf.getChannelData(0);
+      let last = 0;
+      for (let i = 0; i < len; i++) {
+        const w = Math.random() * 2 - 1;
+        last = (last + 0.02 * w) / 1.02;
+        d[i] = last * 3.5;
+      }
+      const src = AC.createBufferSource();
+      src.buffer = buf; src.loop = true;
+      const lp = AC.createBiquadFilter();
+      lp.type = "lowpass"; lp.frequency.value = 90;
+      droneGain = AC.createGain(); droneGain.gain.value = 0.06;
+      src.connect(lp); lp.connect(droneGain); droneGain.connect(AC.destination);
+      src.start();
+
+      // fridge hum
+      const hum = AC.createOscillator();
+      hum.type = "triangle"; hum.frequency.value = 112;
+      humGain = AC.createGain(); humGain.gain.value = 0.004;
+      hum.connect(humGain); humGain.connect(AC.destination);
+      hum.start();
+    } catch (e) {}
+  }
+
+  function chirp(behind) {
+    if (!AC) return;
+    try {
+      const o = AC.createOscillator();
+      o.type = "sine"; o.frequency.value = 3150;
+      const g = AC.createGain();
+      g.gain.setValueAtTime(0.0001, AC.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.22, AC.currentTime + 0.008);
+      g.gain.exponentialRampToValueAtTime(0.0001, AC.currentTime + 0.09);
+      let out = g;
+      if (AC.createStereoPanner) {
+        const p = AC.createStereoPanner();
+        const pans = [0.25, -0.5, -0.25, 0.5];
+        let pan = S.up ? 0 : pans[S.facing];
+        if (behind) pan = -pan * 1.6;
+        p.pan.value = Math.max(-1, Math.min(1, pan));
+        g.connect(p); out = p;
+      }
+      o.connect(g); out.connect(AC.destination);
+      o.start(); o.stop(AC.currentTime + 0.1);
+    } catch (e) {}
+    // LED flash if you happen to be looking at it
+    const led = document.getElementById('detLED');
+    if (led) {
+      led.setAttribute('opacity', '1');
+      setTimeout(() => { const l = document.getElementById('detLED'); if (l) l.setAttribute('opacity', '0.15'); }, 350);
+    }
+    // the tab itself chirps
+    const t = document.title;
+    document.title = "*chirp*";
+    setTimeout(() => { document.title = "LOW BATTERY"; }, 1800);
+  }
+
+  function chirpCycle() {
+    if (!S.started) return;
+    const behind = S.dread > 20 && Math.random() < 0.1;
+    chirp(behind);
+    if (S.dread > 10 && Math.random() < 0.12) setTimeout(() => chirp(behind), 700);
+  }
+  setInterval(chirpCycle, 34000);
+
+  /* ============================ DREAD EFFECTS ============================ */
+  function onDread() {
+    document.getElementById('vignette').style.opacity = Math.min(0.6, S.dread * 0.013);
+    if (!reduceMotion && S.dread > 14 && Math.random() < 0.12) {
+      const f = document.getElementById('flick');
+      f.style.opacity = '1';
+      setTimeout(() => { f.style.opacity = '0'; }, 70);
+    }
+    // the door comes back, eventually
+    if (S.doorStage === 1 && S.dread >= 30) S.doorStage = 2;
+    // the AA appears
+    if (!S.hasAA && S.dread >= 12) S.hasAA = true;
+  }
+
+  /* ============================ SVG SCENES ============================ */
+  const VB = 'viewBox="0 0 800 450" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"';
+
+  function room(wall, floor) {
+    return '<rect x="0" y="0" width="800" height="340" fill="' + wall + '"/>' +
+      '<rect x="0" y="0" width="800" height="60" fill="rgba(0,0,0,0.10)"/>' +
+      '<rect x="0" y="326" width="800" height="14" fill="#857662"/>' +
+      '<rect x="0" y="340" width="800" height="110" fill="' + floor + '"/>' +
+      '<line x1="0" y1="376" x2="800" y2="376" stroke="rgba(0,0,0,0.12)"/>' +
+      '<line x1="0" y1="412" x2="800" y2="412" stroke="rgba(0,0,0,0.12)"/>';
+  }
+
+  /* ---- NORTH: door, photo, clock ---- */
+  function vNorth() {
+    let s = room("#b1a48d", "#73604a");
+    // door / wall / door-open
+    if (S.doorStage === 1) {
+      s += '<g data-obj="doorWall"><rect x="318" y="78" width="164" height="252" fill="#b1a48d"/>' +
+           '<rect x="318" y="78" width="164" height="252" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="2"/></g>';
+    } else {
+      const openNow = S.open.frontDoor && S.doorStage === 2;
+      if (openNow) {
+        s += '<g data-obj="door">' +
+             '<rect x="318" y="78" width="164" height="252" fill="#171310"/>' +
+             // the room inside the door
+             '<rect x="330" y="95" width="140" height="180" fill="#5d5345"/>' +
+             '<rect x="330" y="245" width="140" height="60" fill="#41362a"/>' +
+             '<rect x="380" y="130" width="40" height="80" fill="#3d2c1f"/>' +
+             '<circle cx="412" cy="172" r="2" fill="#1c130c"/>' +
+             '<circle cx="360" cy="104" r="6" fill="#cfc8ba"/>' +
+             '<circle cx="360" cy="104" r="1.6" fill="#c0392b"/>' +
+             '<rect x="318" y="78" width="14" height="252" fill="#6b4a32"/>' +
+             '</g>';
+      } else {
+        s += '<g data-obj="door">' +
+             '<rect x="318" y="78" width="164" height="252" fill="#6b4a32"/>' +
+             '<rect x="332" y="94" width="136" height="100" fill="none" stroke="#553a26" stroke-width="3"/>' +
+             '<rect x="332" y="208" width="136" height="106" fill="none" stroke="#553a26" stroke-width="3"/>' +
+             (cnt('door') >= 3 ? '' : '<circle cx="460" cy="206" r="6" fill="#b89a6a"/>') +
+             '</g>';
+      }
+    }
+    // photo
+    const fig = Math.max(0, 4 - cnt('photo'));
+    let inner = '';
+    if (cnt('photo') >= 5) {
+      inner = '<rect x="128" y="128" width="74" height="48" fill="#5d5345"/>' +
+              '<rect x="150" y="142" width="14" height="28" fill="#3d2c1f"/>' +
+              '<circle cx="190" cy="134" r="3" fill="#cfc8ba"/>';
+    } else {
+      inner = '<rect x="128" y="128" width="74" height="48" fill="#8c9a8a"/>';
+      for (let i = 0; i < fig; i++) {
+        const fx = 140 + i * 16;
+        inner += '<circle cx="' + fx + '" cy="146" r="5" fill="#3a3a35"/>' +
+                 '<rect x="' + (fx - 4) + '" y="151" width="8" height="18" fill="#3a3a35"/>';
+      }
+    }
+    s += '<g data-obj="photo"><rect x="122" y="122" width="86" height="60" fill="#4a3826"/>' + inner + '</g>';
+    // clock
+    const thirteen = cnt('clock') >= 3;
+    s += '<g data-obj="clock"><circle cx="612" cy="150" r="40" fill="#e6e0d0" stroke="#4a3826" stroke-width="5"/>';
+    for (let i = 0; i < (thirteen ? 13 : 12); i++) {
+      const a = (i / (thirteen ? 13 : 12)) * Math.PI * 2;
+      const x1 = 612 + Math.cos(a) * 32, y1 = 150 + Math.sin(a) * 32;
+      const x2 = 612 + Math.cos(a) * 36, y2 = 150 + Math.sin(a) * 36;
+      s += '<line x1="' + x1.toFixed(1) + '" y1="' + y1.toFixed(1) + '" x2="' + x2.toFixed(1) + '" y2="' + y2.toFixed(1) + '" stroke="#4a3826" stroke-width="2"/>';
+    }
+    s += '<line x1="612" y1="150" x2="612" y2="128" stroke="#2c2218" stroke-width="4"/>' +     /* hour ~3:34 -> pointing ~3.5 */
+         '<line x1="612" y1="150" x2="634" y2="156" stroke="#2c2218" stroke-width="4"/>' +
+         '<g id="secHand"><line x1="612" y1="150" x2="600" y2="174" stroke="#8a2c20" stroke-width="1.5"/></g>' +
+         '</g>';
+    return s;
+  }
+
+  /* ---- EAST: window, desk with 3 drawers, mug ---- */
+  function windowScene() {
+    const stage = Math.min(S.eastVisits, 6);
+    const skies = ["#cdb98a", "#b08d62", "#4a4458", "#23222e", "#15141c"];
+    if (stage >= 5) {
+      // the room outside
+      return '<rect x="292" y="82" width="216" height="146" fill="#100d0a"/>' +
+             '<rect x="306" y="96" width="188" height="100" fill="#4d4538"/>' +
+             '<rect x="306" y="180" width="188" height="34" fill="#352b20"/>' +
+             '<circle cx="400" cy="106" r="7" fill="#cfc8ba"/>' +
+             '<circle cx="400" cy="106" r="1.8" fill="#c0392b"/>';
+    }
+    return '<rect x="292" y="82" width="216" height="146" fill="' + skies[Math.min(stage, skies.length - 1)] + '"/>' +
+           (stage < 2 ? '<rect x="300" y="160" width="200" height="68" fill="rgba(90,80,60,0.5)"/>' : '');
+  }
+
+  function vEast() {
+    let s = room("#aca08a", "#73604a");
+    s += '<g data-obj="window">' + windowScene() +
+         '<rect x="284" y="74" width="232" height="162" fill="none" stroke="#5d4a36" stroke-width="12"/>' +
+         '<line x1="400" y1="80" x2="400" y2="230" stroke="#5d4a36" stroke-width="8"/>' +
+         '<line x1="290" y1="155" x2="510" y2="155" stroke="#5d4a36" stroke-width="8"/>' +
+         '</g>';
+    // desk
+    s += '<rect x="70" y="252" width="320" height="16" fill="#5d4a36"/>' +
+         '<rect x="78" y="268" width="304" height="110" fill="#6b573f"/>';
+    // three drawers, right stack
+    for (let i = 1; i <= 3; i++) {
+      const y = 272 + (i - 1) * 34;
+      const id = 'drawer' + i;
+      if (S.open[id]) {
+        s += '<g data-obj="' + id + '">' +
+             '<rect x="252" y="' + y + '" width="118" height="30" fill="#4a3826"/>' +
+             '<rect x="262" y="' + (y + 4) + '" width="120" height="26" fill="#7d6848" stroke="#4a3826"/>' +
+             drawerContents(i, 262, y + 4) +
+             '</g>';
+      } else {
+        s += '<g data-obj="' + id + '">' +
+             '<rect x="252" y="' + y + '" width="118" height="30" fill="#7d6848" stroke="#4a3826"/>' +
+             '<rect x="298" y="' + (y + 12) + '" width="26" height="5" fill="#3c2e1f"/>' +
+             '</g>';
+      }
+    }
+    // mug
+    s += '<g data-obj="mug"><rect x="120" y="232" width="26" height="22" rx="3" fill="#8f8676"/>' +
+         '<path d="M146 238 q12 6 0 14" fill="none" stroke="#8f8676" stroke-width="4"/></g>';
+    return s;
+  }
+
+  function drawerContents(i, x, y) {
+    if (i === 1) {
+      if (cnt('drawer1') >= 3) return '<rect x="' + (x + 18) + '" y="' + (y + 8) + '" width="80" height="12" fill="#cabd9d"/>';
+      return '<rect x="' + (x + 14) + '" y="' + (y + 6) + '" width="60" height="14" fill="#cabd9d"/>' +
+             '<rect x="' + (x + 34) + '" y="' + (y + 9) + '" width="60" height="14" fill="#bfae8c"/>';
+    }
+    if (i === 2) {
+      if (cnt('drawer2') >= 3) return '';
+      return '<rect x="' + (x + 42) + '" y="' + (y + 8) + '" width="26" height="14" fill="rgba(0,0,0,0.13)"/>';
+    }
+    return '<line x1="' + (x + 20) + '" y1="' + (y + 18) + '" x2="' + (x + 70) + '" y2="' + (y + 10) + '" stroke="#2c2218" stroke-width="3"/>' +
+           '<line x1="' + (x + 30) + '" y1="' + (y + 20) + '" x2="' + (x + 84) + '" y2="' + (y + 14) + '" stroke="#3a3328" stroke-width="3"/>';
+  }
+
+  /* ---- SOUTH: fridge, counter, cabinet, shelf w/ jar ---- */
+  function vSouth() {
+    let s = room("#b1a48d", "#73604a");
+    // shelf
+    const jarGone = cnt('fridge') >= 4;
+    s += '<rect x="96" y="128" width="250" height="10" fill="#5d4a36"/>';
+    if (!jarGone) {
+      s += '<g data-obj="jar"><rect x="120" y="96" width="30" height="32" rx="4" fill="#9aa58e" opacity="0.85"/>' +
+           '<rect x="124" y="90" width="22" height="8" fill="#6e6450"/>' +
+           '<rect x="123" y="106" width="24" height="10" fill="#e0d6bc"/></g>';
+    }
+    s += '<g data-obj="books">' +
+         '<rect x="220" y="96" width="14" height="32" fill="#6e4a3a"/>' +
+         '<rect x="236" y="100" width="14" height="28" fill="#54604e"/>' +
+         '<rect x="252" y="92" width="14" height="36" fill="#5a5346"/>' +
+         '</g>';
+    // counter + cabinet
+    s += '<rect x="80" y="246" width="300" height="14" fill="#857662"/>' +
+         '<rect x="88" y="260" width="284" height="106" fill="#6b573f"/>';
+    if (S.open.cabinet) {
+      const facingWall = cnt('cabinet') >= 3;
+      let plates = '';
+      if (!facingWall) {
+        for (let i = 0; i < 4; i++) plates += '<ellipse cx="' + (140 + i * 18) + '" cy="316" rx="9" ry="22" fill="#ddd5c2" stroke="#a99e88"/>';
+      } else {
+        plates = '<rect x="126" y="294" width="86" height="44" fill="#2e2418"/>';
+      }
+      s += '<g data-obj="cabinet"><rect x="104" y="272" width="130" height="84" fill="#3c2e1f"/>' + plates + '</g>' +
+           '<g data-obj="cabinet"><rect x="244" y="272" width="118" height="84" fill="#7d6848" stroke="#4a3826"/><circle cx="254" cy="314" r="4" fill="#3c2e1f"/></g>';
+    } else {
+      s += '<g data-obj="cabinet">' +
+           '<rect x="104" y="272" width="126" height="84" fill="#7d6848" stroke="#4a3826"/>' +
+           '<rect x="236" y="272" width="126" height="84" fill="#7d6848" stroke="#4a3826"/>' +
+           '<circle cx="222" cy="314" r="4" fill="#3c2e1f"/><circle cx="246" cy="314" r="4" fill="#3c2e1f"/>' +
+           '</g>';
+    }
+    // fridge
+    if (S.open.fridge) {
+      const warm = cnt('fridge') >= 3;
+      s += '<g data-obj="fridge">' +
+           '<rect x="556" y="118" width="134" height="252" fill="#b9b2a2"/>' +
+           '<rect x="566" y="128" width="114" height="232" fill="' + (warm ? '#3a2f24' : '#27313a') + '"/>' +
+           '<rect x="566" y="200" width="114" height="6" fill="#888073"/>' +
+           '<rect x="566" y="278" width="114" height="6" fill="#888073"/>' +
+           (cnt('fridge') < 4 ? '<rect x="600" y="176" width="24" height="26" rx="3" fill="#9aa58e" opacity="0.9"/>' : '') +
+           '<rect x="690" y="118" width="44" height="252" fill="#cfc8b8"/>' +
+           '</g>';
+    } else {
+      s += '<g data-obj="fridge">' +
+           '<rect x="556" y="118" width="134" height="252" fill="#cfc8b8"/>' +
+           '<line x1="556" y1="206" x2="690" y2="206" stroke="#a89f8d" stroke-width="3"/>' +
+           '<rect x="566" y="150" width="7" height="44" rx="3" fill="#888073"/>' +
+           '<rect x="566" y="222" width="7" height="70" rx="3" fill="#888073"/>' +
+           '</g>';
+    }
+    return s;
+  }
+
+  /* ---- WEST: couch, side table + drawer + lamp, closet, chair ---- */
+  function vWest() {
+    let s = room("#aca08a", "#73604a");
+    // closet
+    if (S.open.closet) {
+      const sway = cnt('closet') >= 3;
+      s += '<g data-obj="closet">' +
+           '<rect x="618" y="80" width="150" height="254" fill="#241c12"/>' +
+           '<line x1="628" y1="104" x2="758" y2="104" stroke="#6e6450" stroke-width="4"/>' +
+           coats(sway) +
+           '<rect x="744" y="120" width="6" height="170" fill="#7d6848"/>' +
+           '</g>';
+    } else {
+      s += '<g data-obj="closet">' +
+           '<rect x="618" y="80" width="150" height="254" fill="#76603f"/>' +
+           '<line x1="693" y1="80" x2="693" y2="334" stroke="#553a26" stroke-width="4"/>' +
+           '<circle cx="682" cy="208" r="5" fill="#b89a6a"/><circle cx="704" cy="208" r="5" fill="#b89a6a"/>' +
+           '</g>';
+    }
+    // couch
+    s += '<g data-obj="couch">' +
+         '<rect x="80" y="186" width="330" height="70" rx="8" fill="#6f4a45"/>' +
+         '<rect x="70" y="240" width="350" height="86" rx="10" fill="#7d544e"/>' +
+         '<rect x="88" y="248" width="150" height="42" rx="8" fill="#8a5d56"/>' +
+         '<rect x="248" y="248" width="150" height="42" rx="8" fill="#8a5d56"/>' +
+         '<rect x="70" y="296" width="350" height="30" rx="6" fill="#6f4a45"/>' +
+         '</g>';
+    // side table
+    s += '<rect x="470" y="252" width="112" height="12" fill="#5d4a36"/>' +
+         '<rect x="478" y="264" width="10" height="68" fill="#4a3826"/>' +
+         '<rect x="564" y="264" width="10" height="68" fill="#4a3826"/>';
+    if (S.open.sideDrawer) {
+      s += '<g data-obj="sideDrawer">' +
+           '<rect x="486" y="268" width="80" height="26" fill="#3c2e1f"/>' +
+           '<rect x="494" y="272" width="84" height="24" fill="#7d6848" stroke="#4a3826"/>' +
+           (S.hasAA && !S.aaTaken
+             ? '<g data-obj="aa"><rect x="524" y="278" width="26" height="11" rx="2" fill="#b8b3a6"/><rect x="548" y="281" width="4" height="5" fill="#7a766b"/><rect x="528" y="280" width="9" height="7" fill="#8a4a3a"/></g>'
+             : '') +
+           '</g>';
+    } else {
+      s += '<g data-obj="sideDrawer"><rect x="486" y="268" width="80" height="26" fill="#7d6848" stroke="#4a3826"/>' +
+           '<rect x="518" y="278" width="18" height="4" fill="#3c2e1f"/></g>';
+    }
+    // lamp on table
+    s += '<g data-obj="lamp">' +
+         '<rect x="520" y="206" width="6" height="46" fill="#4a4438"/>' +
+         '<path d="M500 206 L546 206 L536 178 L510 178 Z" fill="' + (cnt('lamp') % 2 === 1 ? '#d8c89a' : '#b3a888') + '"/>' +
+         '</g>';
+    // chair (until moved)
+    if (!S.chairMoved) {
+      s += '<g data-obj="chair">' +
+           '<rect x="438" y="318" width="8" height="48" fill="#5d4a36"/>' +
+           '<rect x="402" y="318" width="8" height="48" fill="#5d4a36"/>' +
+           '<rect x="396" y="306" width="56" height="14" fill="#6b573f"/>' +
+           '<rect x="396" y="238" width="10" height="70" fill="#6b573f"/>' +
+           '</g>';
+    }
+    return s;
+  }
+  function coats(sway) {
+    let c = '';
+    for (let i = 0; i < 4; i++) {
+      const x = 644 + i * 26;
+      const tilt = (sway && i === 2) ? ' transform="rotate(7 ' + (x + 8) + ' 108)"' : '';
+      c += '<g' + tilt + '><line x1="' + (x + 8) + '" y1="104" x2="' + (x + 8) + '" y2="116" stroke="#9a8e72" stroke-width="2"/>' +
+           '<path d="M' + x + ' 118 L' + (x + 16) + ' 118 L' + (x + 14) + ' 196 L' + (x + 2) + ' 196 Z" fill="#4e4a40"/></g>';
+    }
+    return c;
+  }
+
+  /* ---- UP: ceiling, fixture, detector ---- */
+  function vUp() {
+    let s = '<rect x="0" y="0" width="800" height="450" fill="#c4bba8"/>' +
+            '<rect x="0" y="0" width="800" height="450" fill="url(#ceilshade)"/>' +
+            '<defs><radialGradient id="ceilshade" cx="0.5" cy="0.5" r="0.8">' +
+            '<stop offset="0%" stop-color="rgba(0,0,0,0)"/><stop offset="100%" stop-color="rgba(0,0,0,0.28)"/>' +
+            '</radialGradient></defs>';
+    // light fixture
+    s += '<g data-obj="fixture"><circle cx="260" cy="210" r="44" fill="#d8d2c0" stroke="#a89f8d" stroke-width="3"/>' +
+         '<circle cx="260" cy="210" r="20" fill="#b8b09a"/></g>';
+    // chair from above
+    if (S.chairMoved) {
+      s += '<g><rect x="468" y="318" width="84" height="84" rx="6" fill="#6b573f" stroke="#4a3826" stroke-width="3"/>' +
+           '<rect x="486" y="336" width="48" height="48" rx="4" fill="#7d6848"/></g>';
+    }
+    // smoke detector
+    s += '<g data-obj="detector">' +
+         '<circle cx="510" cy="200" r="40" fill="#e8e4da" stroke="#b8b09a" stroke-width="3"/>' +
+         '<circle cx="510" cy="200" r="26" fill="#ddd8cc"/>';
+    for (let i = 0; i < 8; i++) {
+      const a = (i / 8) * Math.PI * 2;
+      s += '<rect x="' + (510 + Math.cos(a) * 31 - 3) + '" y="' + (200 + Math.sin(a) * 31 - 1.5) + '" width="6" height="3" rx="1" fill="#b8b09a" transform="rotate(' + (a * 180 / Math.PI) + ' ' + (510 + Math.cos(a) * 31) + ' ' + (200 + Math.sin(a) * 31) + ')"/>';
+    }
+    if (S.compOpen) {
+      s += '<g><rect x="492" y="186" width="36" height="26" rx="3" fill="#14110c"/>' +
+           '<rect x="524" y="178" width="36" height="26" rx="3" fill="#cfc9bb" stroke="#a89f8d" transform="rotate(24 524 178)"/></g>';
+    }
+    s += '<circle id="detLED" cx="510" cy="222" r="3.5" fill="#c0392b" opacity="0.15"/>' +
+         '</g>';
+    return s;
+  }
+
+  /* ============================ RENDER ============================ */
+  function render() {
+    let inner;
+    if (S.up) inner = vUp();
+    else inner = [vNorth, vEast, vSouth, vWest][S.facing]();
+    sceneEl.innerHTML = '<svg ' + VB + '>' + inner + '</svg>';
+    document.getElementById('navU').style.display = S.up ? 'none' : '';
+    document.getElementById('navD').style.display = S.up ? '' : 'none';
+    document.getElementById('navL').style.display = S.up ? 'none' : '';
+    document.getElementById('navR').style.display = S.up ? 'none' : '';
+  }
+
+  function changeView(fn) {
+    S.open = {};   // drawers close themselves when you look away. of course they do.
+    fn();
+    if (!S.up && S.facing === 1) S.eastVisits++;
+    render();
+  }
+
+  document.getElementById('navL').addEventListener('click', () => changeView(() => { S.facing = (S.facing + 3) % 4; }));
+  document.getElementById('navR').addEventListener('click', () => changeView(() => { S.facing = (S.facing + 1) % 4; }));
+  document.getElementById('navU').addEventListener('click', () => changeView(() => { S.up = true; }));
+  document.getElementById('navD').addEventListener('click', () => changeView(() => { S.up = false; }));
+
+  /* ============================ INTERACTION ============================ */
+  sceneEl.addEventListener('click', (e) => {
+    const g = e.target.closest('[data-obj]');
+    if (!g) return;
+    e.stopPropagation();
+    interact(g.getAttribute('data-obj'));
+  });
+
+  function generic(key, arr) {
+    const n = bump(key);
+    caption(pick(arr, n));
+  }
+
+  function interact(obj) {
+    switch (obj) {
+      case 'door': {
+        if (S.doorStage === 2) {
+          if (!S.open.frontDoor) {
+            S.open.frontDoor = true;
+            const n = bump('doorOpen');
+            caption(pick(M.doorOpen, n));
+            render();
+          } else {
+            S.open.frontDoor = false;
+            caption("You close it. Somewhere inside it, a door also closes.");
+            render();
+          }
+          return;
+        }
+        const n = bump('door');
+        caption(pick(M.door, n));
+        if (n >= 4) { S.doorStage = 1; render(); caption(M.doorWall[0]); S.counts.doorWall = 1; }
+        else if (n >= 3) render(); // knob disappears
+        return;
+      }
+      case 'doorWall': generic('doorWall', M.doorWall); return;
+
+      case 'photo': { const n = bump('photo'); caption(pick(M.photo, n)); render(); return; }
+      case 'clock': { const n = bump('clock'); caption(pick(M.clock, n)); if (n === 3) render(); return; }
+      case 'window': { const stage = Math.min(Math.max(S.eastVisits, 1), 6); bump('window'); caption(M.window[stage - 1]); return; }
+
+      case 'drawer1': case 'drawer2': case 'drawer3': {
+        if (!S.open[obj]) {
+          S.open[obj] = true;
+          const n = bump(obj);
+          caption(pick(M[obj], n));
+          render();
+        } else {
+          S.open[obj] = false;
+          caption("You close the drawer.");
+          render();
+        }
+        return;
+      }
+      case 'mug': generic('mug', M.mug); return;
+
+      case 'fridge': {
+        if (!S.open.fridge) {
+          S.open.fridge = true;
+          const n = bump('fridge');
+          caption(pick(M.fridge, n));
+          if (humGain) humGain.gain.setTargetAtTime(0.03, AC.currentTime, 0.3);
+          render();
+        } else {
+          S.open.fridge = false;
+          caption("You close the fridge. The hum does not change.");
+          if (humGain) humGain.gain.setTargetAtTime(0.004, AC.currentTime, 0.5);
+          render();
+        }
+        return;
+      }
+      case 'cabinet': {
+        if (!S.open.cabinet) {
+          S.open.cabinet = true;
+          const n = bump('cabinet');
+          caption(pick(M.cabinet, n));
+          render();
+        } else {
+          S.open.cabinet = false;
+          caption("You close the cabinet.");
+          render();
+        }
+        return;
+      }
+      case 'jar': generic('jar', M.jar); return;
+      case 'books': generic('books', M.books); return;
+      case 'couch': generic('couch', M.couch); return;
+      case 'lamp': { const n = bump('lamp'); caption(pick(M.lamp, n)); render(); return; }
+      case 'closet': {
+        if (!S.open.closet) {
+          S.open.closet = true;
+          const n = bump('closet');
+          caption(pick(M.closet, n));
+          render();
+        } else {
+          S.open.closet = false;
+          caption("You close the closet.");
+          render();
+        }
+        return;
+      }
+      case 'sideDrawer': {
+        if (!S.open.sideDrawer) {
+          S.open.sideDrawer = true;
+          if (S.hasAA && !S.aaTaken) {
+            bump('sideDrawer');
+            caption(M.aa[0]);
+          } else {
+            const n = bump('sideDrawerE');
+            caption(pick(M.sideDrawerEmpty, n));
+          }
+          render();
+        } else {
+          S.open.sideDrawer = false;
+          caption("You close the drawer.");
+          render();
+        }
+        return;
+      }
+      case 'aa': {
+        if (!S.aaTaken) {
+          S.aaTaken = true;
+          bump('aa');
+          caption(M.aa[1]);
+          renderInv();
+          render();
+        }
+        return;
+      }
+      case 'chair': {
+        const ready = S.dread >= 25 && cnt('detectorFar') >= 3;
+        if (!ready) { generic('chairEarly', M.chairEarly); return; }
+        S.chairMoved = true;
+        bump('chair');
+        caption("You drag the chair beneath the smoke detector. It is heavier than a chair.");
+        render();
+        return;
+      }
+      case 'fixture': generic('fixture', M.fixture); return;
+      case 'detector': {
+        if (S.compDone) { generic('detectorDone', M.detectorDone); return; }
+        if (!S.chairMoved) { generic('detectorFar', M.detectorFar); return; }
+        const n = bump('detectorChair');
+        if (n === 1) {
+          caption("You climb onto the chair. Your fingers brush the casing. It chirps, once, into your hand.");
+          chirp(false);
+        } else if (n === 2) {
+          S.compOpen = true;
+          render();
+          caption("You pry open the battery compartment. There is no battery inside. There has never been a battery inside.");
+          setTimeout(() => chirp(false), 1400);
+          setTimeout(() => {
+            S.compOpen = false;
+            S.compDone = true;
+            render();
+            caption("The compartment has closed itself.");
+          }, 7000);
+        }
+        return;
+      }
+      default: {
+        bump(obj);
+        caption("Nothing.");
+      }
+    }
+  }
+
+  /* ============================ INVENTORY ============================ */
+  const invEl = document.getElementById('inv');
+  function renderInv() {
+    if (S.aaTaken) {
+      invEl.innerHTML = '<svg viewBox="0 0 40 40"><rect x="6" y="14" width="24" height="12" rx="2" fill="#b8b3a6"/><rect x="30" y="17" width="4" height="6" fill="#7a766b"/><rect x="9" y="16" width="8" height="8" fill="#8a4a3a"/></svg>';
+      invEl.title = "AA battery";
+    } else {
+      invEl.innerHTML = '';
+      invEl.title = "";
+    }
+  }
+  invEl.addEventListener('click', () => {
+    if (!S.aaTaken) { caption("You are carrying nothing useful. This is consistent."); return; }
+    const n = bump('invAA');
+    caption(pick(M.invAA, n));
+  });
+
+  /* ============================ START ============================ */
+  document.getElementById('intro').addEventListener('click', function () {
+    this.style.display = 'none';
+    S.started = true;
+    audioInit();
+    render();
+    caption("The smoke detector is chirping. It needs a 9-volt battery. There will be one around here somewhere.");
+    setTimeout(() => chirp(false), 2500);
+  });
+})();
+</script>
+</body>
+</html>

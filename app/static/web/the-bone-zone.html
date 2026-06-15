@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>~*~ THE BONE ZONE ~*~ Skeleton Oracle of the World Wide Web</title>
+<style>
+  /* ============ THE AESTHETIC CRIMES BEGIN HERE ============ */
+  @keyframes blink { 0%,49% {visibility:visible;} 50%,100% {visibility:hidden;} }
+  @keyframes marquee { 0% {transform:translateX(100vw);} 100% {transform:translateX(-100%);} }
+  @keyframes spin3d { 0% {transform:rotateY(0deg);} 100% {transform:rotateY(360deg);} }
+  @keyframes rainbow {
+    0% {color:#ff0000;} 16% {color:#ff9900;} 33% {color:#ffff00;}
+    50% {color:#00ff00;} 66% {color:#00ccff;} 83% {color:#cc00ff;} 100% {color:#ff0000;}
+  }
+  @keyframes wobble { 0%,100%{transform:rotate(-3deg);} 50%{transform:rotate(3deg);} }
+  @keyframes floaty { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-14px);} }
+  @keyframes flamebar {
+    0%,100% {background:linear-gradient(90deg,#ff0000,#ff9900,#ff0000);}
+    50% {background:linear-gradient(90deg,#ff9900,#ff0000,#ff9900);}
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+
+  html { cursor: crosshair; }
+  body {
+    margin: 0;
+    font-family: "Comic Sans MS", "Comic Sans", cursive;
+    color: #00ff00;
+    /* tiled starfield, hand-rolled because GeoCities would have wanted it that way */
+    background-color: #000022;
+    background-image:
+      radial-gradient(1px 1px at 13px 17px, #fff, transparent),
+      radial-gradient(1px 1px at 47px 59px, #ccccff, transparent),
+      radial-gradient(2px 2px at 88px 31px, #ffff99, transparent),
+      radial-gradient(1px 1px at 71px 83px, #fff, transparent),
+      radial-gradient(1px 1px at 29px 94px, #99ffff, transparent);
+    background-size: 100px 100px;
+    overflow-x: hidden;
+    text-align: center;
+  }
+
+  .marquee-wrap {
+    background:#000066; border-top:3px ridge #c0c0c0; border-bottom:3px ridge #c0c0c0;
+    overflow:hidden; white-space:nowrap; padding:4px 0;
+  }
+  .marquee-wrap span {
+    display:inline-block; animation: marquee 18s linear infinite;
+    color:#ffff00; font-weight:bold;
+  }
+
+  h1 {
+    font-size: clamp(1.6rem, 6vw, 3.2rem);
+    margin: 18px 0 4px 0;
+    animation: rainbow 3s linear infinite;
+    text-shadow: 3px 3px 0 #660066;
+    letter-spacing: 2px;
+  }
+  .blink { animation: blink 1s step-start infinite; }
+  .subtitle { color:#ff66ff; font-style:italic; }
+
+  .flames { height:14px; animation: flamebar 0.6s linear infinite; border:2px outset #888; margin:10px auto; max-width:680px; }
+
+  .skeleton-stage {
+    perspective: 600px;
+    margin: 20px auto 6px auto;
+  }
+  #skeleton {
+    display:inline-block;
+    font-size: clamp(3.5rem, 14vw, 7rem);
+    animation: spin3d 4s linear infinite, floaty 3s ease-in-out infinite;
+    filter: drop-shadow(0 0 12px #00ff00);
+    user-select: none;
+  }
+  #skeleton.thinking { animation: spin3d 0.35s linear infinite; filter: drop-shadow(0 0 20px #ff00ff); }
+
+  .panel {
+    background:#000000;
+    border: 4px ridge #c0c0c0;
+    max-width: 640px;
+    margin: 14px auto;
+    padding: 14px;
+    box-shadow: 8px 8px 0 #330033;
+  }
+
+  input[type=text] {
+    font-family:"Comic Sans MS", cursive;
+    background:#000; color:#00ff00;
+    border: 3px inset #888;
+    padding: 8px;
+    width: min(86%, 420px);
+    font-size: 1rem;
+  }
+  input[type=text]:focus { outline: 3px dashed #ff00ff; }
+
+  button {
+    font-family:"Comic Sans MS", cursive;
+    font-weight:bold;
+    font-size:1rem;
+    color:#000;
+    background: linear-gradient(#dfdfdf,#9f9f9f);
+    border: 4px outset #c0c0c0;
+    padding: 8px 18px;
+    margin: 8px 4px;
+    cursor: pointer;
+  }
+  button:active { border-style: inset; }
+  button:focus-visible { outline: 3px dashed #ffff00; outline-offset: 2px; }
+  .danger {
+    background: linear-gradient(#ff6666,#aa0000);
+    color:#fff;
+    animation: wobble 0.5s ease-in-out infinite;
+  }
+
+  #answer {
+    min-height: 3.2em;
+    font-size: 1.25rem;
+    color:#ffff00;
+    text-shadow: 2px 2px 0 #aa00aa;
+  }
+
+  .counter {
+    font-family:"Courier New", monospace;
+    background:#000; color:#ff0000;
+    border:3px inset #555;
+    display:inline-block;
+    padding:4px 10px;
+    font-size:1.3rem;
+    letter-spacing:4px;
+  }
+
+  .construction {
+    color:#ffcc00; background:repeating-linear-gradient(45deg,#000,#000 12px,#ffcc00 12px,#ffcc00 24px);
+    border:3px ridge #c0c0c0;
+    max-width:420px; margin:16px auto; padding:6px;
+  }
+  .construction span { background:#000; padding:2px 8px; display:inline-block; }
+
+  .guestbook { text-align:left; font-size:0.9rem; color:#ccffcc; }
+  .guestbook b { color:#ff99ff; }
+  .guestbook div { border-bottom:1px dashed #444; padding:4px 0; }
+
+  .badges { margin: 18px 0; }
+  .badge {
+    display:inline-block; border:2px outset #999;
+    font-size:0.7rem; padding:3px 7px; margin:3px;
+    background:#222; color:#9cf;
+    font-family:"Courier New", monospace;
+  }
+
+  footer { color:#8888aa; font-size:0.75rem; padding: 14px 0 30px 0; }
+  a { color:#66ccff; }
+  a:visited { color:#cc66ff; }
+
+  .skull-trail {
+    position:fixed; pointer-events:none; font-size:14px;
+    transition: opacity 1s linear; z-index: 999;
+  }
+  .invert * { background:#fff !important; }
+  .invert { filter: invert(1) hue-rotate(180deg); }
+</style>
+</head>
+<body>
+
+<div class="marquee-wrap" aria-hidden="true">
+  <span>☠ WELCOME TO THE BONE ZONE ☠ home of the ETERNAL SKELETON ORACLE ☠ best viewed in Netscape Navigator 4.0 at 800x600 resolution ☠ this page is Y2K compliant (probably) ☠ NO FRAMES NO MASTERS ☠</span>
+</div>
+
+<h1>~*~ THE BONE ZONE ~*~</h1>
+<div class="subtitle">est. 1997 &nbsp;✦&nbsp; <span class="blink">!! NOW WITH 3D !!</span></div>
+<div class="flames"></div>
+
+<div class="skeleton-stage">
+  <div id="skeleton" role="img" aria-label="a rotating skeleton">💀</div>
+</div>
+<div style="color:#ff66ff;">the Oracle is LISTENING</div>
+
+<div class="panel">
+  <p style="color:#00ffcc;">Ask the Eternal Skeleton Oracle any YES or NO question.<br>
+  <small style="color:#888;">(the Oracle reserves the right to answer neither)</small></p>
+  <input type="text" id="question" placeholder="type ur question here..." aria-label="your question for the oracle">
+  <br>
+  <button id="askBtn">🔮 CONSULT THE BONES 🔮</button>
+  <div id="answer" aria-live="polite"></div>
+</div>
+
+<div class="panel">
+  <div style="color:#ff9999;">You are visitor number:</div>
+  <div class="counter" id="counter">0013337</div>
+  <div style="font-size:0.75rem; color:#777;">(counter installed backwards in 1999. webmaster never fixed it. webmaster is gone now.)</div>
+</div>
+
+<div class="construction"><span>🚧 UNDER CONSTRUCTION SINCE 1997 🚧</span></div>
+
+<div class="panel">
+  <div style="color:#ffcc66; font-weight:bold;">⚠ THE BUTTON ⚠</div>
+  <p style="color:#aaa; font-size:0.85rem;">we don't know what it does. nobody who pressed it ever told us.</p>
+  <button class="danger" id="doNotPress">DO NOT PRESS</button>
+  <div id="pressResult" style="color:#ff6666; min-height:1.4em;" aria-live="polite"></div>
+</div>
+
+<div class="panel guestbook">
+  <div style="text-align:center; color:#ffff66; font-weight:bold;">📖 GUESTBOOK 📖</div>
+  <div><b>xX_NightWolf_Xx</b> (03/14/1998): cool skeleton. it told me my fish was lying to me. it was right</div>
+  <div><b>WebSurfer2000</b> (11/02/1999): asked if y2k will destroy us. oracle said "the bones do not do calendars." unhelpful. 5 stars</div>
+  <div><b>mom</b> (06/23/2001): steve please come downstairs dinner is ready</div>
+  <div><b>THE ORACLE ITSELF</b> (??/??/????): stop asking me about crypto</div>
+  <div id="newEntries"></div>
+  <div style="text-align:center; margin-top:8px;">
+    <button id="signBtn" style="font-size:0.8rem;">✒ sign guestbook ✒</button>
+  </div>
+</div>
+
+<div class="badges" aria-hidden="true">
+  <span class="badge">[ MIDI: OFF ]</span>
+  <span class="badge">[ 56K FRIENDLY ]</span>
+  <span class="badge">[ ANTI GIF THEFT ]</span>
+  <span class="badge">[ HTML 3.2 VALID* ]</span>
+  <span class="badge">[ WEBRING: PENDING SINCE 2001 ]</span>
+</div>
+
+<footer>
+  © 1997–<span id="year"></span> The Bone Zone. All bones reserved.<br>
+  *not actually valid &nbsp;|&nbsp; no skeletons were harmed, they were already like that<br>
+  <span style="font-size:0.65rem;">this site collects no data because the webmaster never learned how</span>
+</footer>
+
+<script>
+// ============ THE ORACLE ============
+const answers = [
+  "the bones say: yes, but in a way you won't enjoy",
+  "NO. and stop asking.",
+  "ask again after the moon apologizes",
+  "the answer is inside the question. the question is inside you. this is gross.",
+  "yes ✨ (margin of error: 100%)",
+  "the bones rolled under the couch. try later.",
+  "absolutely, unless it matters",
+  "the Oracle consulted a second, smaller skeleton. it shrugged.",
+  "outlook hazy. so is the Oracle. everything here is hazy.",
+  "no, but you should do it anyway",
+  "the bones spell out: 'W H Y'",
+  "yes, on a Tuesday. never on a Tuesday.",
+  "ERROR: question too mortal",
+  "the Oracle answered, but in MIDI format, and you don't have the plugin",
+  "signs point to mmmmmmaybe",
+  "the bones say yes. the bones have been wrong before. ask the bones about 1999.",
+  "rephrase your question as a guitar riff and try again"
+];
+const noQuestion = [
+  "you have to actually type a question. the Oracle is dead, not psychic.",
+  "the Oracle stares at your empty question. the Oracle is disappointed.",
+  "silence?? bold. the answer to silence is: 'no'."
+];
+
+const skeleton = document.getElementById('skeleton');
+const answerEl = document.getElementById('answer');
+const askBtn = document.getElementById('askBtn');
+const qInput = document.getElementById('question');
+
+let audioCtx = null;
+function bloop(freq, dur, type='square', vol=0.06) {
+  try {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(vol, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur);
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(); o.stop(audioCtx.currentTime + dur);
+  } catch(e){}
+}
+// horrible little dial-up impression
+function dialUp() {
+  const notes = [1209,1336,941,1633,770,1477,852,1209];
+  notes.forEach((f,i)=> setTimeout(()=>bloop(f,0.09,'square',0.05), i*90));
+  setTimeout(()=>bloop(2100,0.5,'sawtooth',0.03), notes.length*90);
+}
+
+function consult() {
+  const q = qInput.value.trim();
+  answerEl.textContent = "";
+  skeleton.classList.add('thinking');
+  dialUp();
+  const delay = 1400 + Math.random()*1200;
+  setTimeout(()=>{
+    skeleton.classList.remove('thinking');
+    const pool = q ? answers : noQuestion;
+    answerEl.textContent = pool[Math.floor(Math.random()*pool.length)];
+    bloop(660,0.15); setTimeout(()=>bloop(440,0.2),150);
+  }, delay);
+}
+askBtn.addEventListener('click', consult);
+qInput.addEventListener('keydown', e => { if (e.key==='Enter') consult(); });
+
+// ============ THE BACKWARDS COUNTER ============
+let count = 13337;
+const counterEl = document.getElementById('counter');
+setInterval(()=>{
+  count--;
+  if (count <= 0) count = 13337; // the counter is also a cycle of rebirth
+  counterEl.textContent = String(count).padStart(7,'0');
+}, 2200);
+
+// ============ THE BUTTON ============
+const pressResults = [
+  "you pressed it. somewhere, a fax machine woke up.",
+  "the page is now haunted slightly more than before.",
+  "nothing happened. or did it. (it didn't) (or did it)",
+  "the Oracle felt that. press it again and find out what fear tastes like.",
+  "a single bone has been added to your permanent record."
+];
+let pressCount = 0;
+document.getElementById('doNotPress').addEventListener('click', ()=>{
+  pressCount++;
+  bloop(120,0.3,'sawtooth',0.08);
+  document.getElementById('pressResult').textContent = pressResults[Math.min(pressCount-1, pressResults.length-1)];
+  document.body.classList.add('invert');
+  setTimeout(()=>document.body.classList.remove('invert'), 350);
+  if (pressCount >= 6) {
+    document.getElementById('pressResult').textContent = "ok seriously the webmaster said to stop";
+  }
+});
+
+// ============ GUESTBOOK ============
+const fakeNames = ["DarkAngel_84","crt_monitor_fan","skeletonenjoyer","GeoCitizen","y2k_survivor","BoneAppreciator9"];
+const fakeMsgs = [
+  "first!!! (i am the 5th person to say this)",
+  "the skeleton winked at me. do not trust the skeleton.",
+  "came for the oracle, stayed because the back button stopped working",
+  "this site cured my dial-up",
+  "i asked about my crush and the bones laughed at me. fair."
+];
+document.getElementById('signBtn').addEventListener('click', ()=>{
+  const div = document.createElement('div');
+  const n = fakeNames[Math.floor(Math.random()*fakeNames.length)];
+  const m = fakeMsgs[Math.floor(Math.random()*fakeMsgs.length)];
+  div.innerHTML = "<b>"+n+"</b> (just now): "+m;
+  document.getElementById('newEntries').appendChild(div);
+  bloop(880,0.1);
+});
+
+// ============ SKULL CURSOR TRAIL (why? exactly.) ============
+let lastTrail = 0;
+document.addEventListener('mousemove', e=>{
+  const now = Date.now();
+  if (now - lastTrail < 90) return;
+  lastTrail = now;
+  const s = document.createElement('div');
+  s.className = 'skull-trail';
+  s.textContent = '☠';
+  s.style.left = (e.clientX+8)+'px';
+  s.style.top = (e.clientY+8)+'px';
+  s.style.color = ['#ff66ff','#66ff66','#ffff66','#66ffff'][Math.floor(Math.random()*4)];
+  document.body.appendChild(s);
+  requestAnimationFrame(()=>{ s.style.opacity = '0'; });
+  setTimeout(()=>s.remove(), 1100);
+});
+
+document.getElementById('year').textContent = new Date().getFullYear();
+
+// the title tag also blinks, because of course it does
+let titleFlip = false;
+setInterval(()=>{
+  titleFlip = !titleFlip;
+  document.title = titleFlip ? "~*~ THE BONE ZONE ~*~" : "☠☠☠ THE BONE ZONE ☠☠☠";
+}, 1500);
+</script>
+</body>
+</html>
