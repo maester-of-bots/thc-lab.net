@@ -37,8 +37,10 @@ class db:
         else:
             conn = self.get_db()
             cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-
-            cur.execute(f"INSERT INTO {self.table} ({self.column}) VALUES ('{url}', '{domain}')")
+            cur.execute(
+                f"INSERT INTO {self.table} ({self.column}) VALUES (%s, %s)",
+                (url, domain)
+            )
             conn.commit()
             cur.close()
             conn.close()
@@ -46,20 +48,29 @@ class db:
     def get_url(self, url, domain):
         conn = self.get_db()
         cur = conn.cursor()
-        cur.execute(f"SELECT * FROM {self.table} WHERE original_url LIKE '{url}' AND base LIKE '{domain}'")
+        cur.execute(
+            f"SELECT * FROM {self.table} WHERE original_url = %s AND base = %s",
+            (url, domain)
+        )
         result = cur.fetchone()
         cur.close()
         conn.close()
         return result
 
-    def get_url_for_redirect(self,original_id, domain):
+    def get_url_for_redirect(self, original_id, domain):
         conn = self.get_db()
         cur = conn.cursor()
-        cur.execute(f"SELECT original_url, clicks FROM {self.table} WHERE id = '{original_id}' AND base LIKE '{domain}'")
+        cur.execute(
+            f"SELECT original_url, clicks FROM {self.table} WHERE id = %s AND base = %s",
+            (original_id, domain)
+        )
         data = cur.fetchone()
         url_to_return = data[0]
         clicks = data[1]
-        cur.execute(f"UPDATE {self.table} SET clicks = {clicks+1} WHERE id = {original_id} AND base LIKE '{domain}'")
+        cur.execute(
+            f"UPDATE {self.table} SET clicks = %s WHERE id = %s AND base = %s",
+            (clicks + 1, original_id, domain)
+        )
         conn.commit()
         conn.close()
         return url_to_return

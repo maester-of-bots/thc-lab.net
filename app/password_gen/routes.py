@@ -9,20 +9,16 @@ from app.password_gen.words_list import *
 # Password Buddy
 ###############################
 
-lastnum = [-1,-1]
-
-def complicate_word(characters,word):
+def complicate_word(characters, word):
     c = list(zip(characters[0], characters[1]))
     random.shuffle(c)
-    characters[0], characters[1] = zip(*c)
+    chars0, chars1 = zip(*c)
 
-    for i in range(0,len(characters[0])):
-        if characters[0][i] in word:
-            Word = word.replace(characters[0][i],characters[1][i],1)
-    try:
-        return Word
-    except:
-        return (word+"#")
+    result = word
+    for i in range(len(chars0)):
+        if chars0[i] in result:
+            result = result.replace(chars0[i], chars1[i], 1)
+    return result
 
 def getSpecial():
     chars=["!","@","#"]
@@ -32,11 +28,12 @@ def getNumber():
     return random.randint(0,9)
 
 def addCap(password):
-    new=list(password)
-    for i in range(0, len(new)):
+    new = list(password)
+    for i in range(len(new)):
         if new[i].isalpha():
-            new[i] = new[i].capitalize()
-            return new
+            new[i] = new[i].upper()
+            break
+    return new
 
 
 def getCount():
@@ -68,23 +65,14 @@ def getWords(result):
 
     newwords = []
     plaintexts = []
-    global lastnum
-    for i in range(0,2):
-        num1 = random.randint(0, len(words[i]))-1
-        if num1==lastnum[i]:
-            num1 = random.randint(0, len(words[i]))-1
-        if num1==lastnum[i]:
-            num1 = random.randint(0, len(words[i]))-1
-        lastnum[i]=num1
+    for i in range(0, 2):
+        num1 = random.randint(0, len(words[i]) - 1)
         word = words[i][num1]
         plaintexts.append(word)
         newwords.append(complicate_word(chars,word))
     return newwords,plaintexts
 
 
-
-
-password_gen = Blueprint('password_gen', __name__)
 
 
 # Password generator

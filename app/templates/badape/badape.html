@@ -2,47 +2,36 @@
 
 {% block title %} Bad Ape {% endblock %}
 
-<!-- Element injected in the BODY element -->
 {% block body_class %} sidebar-mini {% endblock body_class %}
 
 {% block content %}
   <div class="content-wrapper">
-
-    <!-- Content Header (Page header) -->
     <div class="content-header">
       <div class="container-fluid">
-          <h1>Archived because u/Spez is a dick</h1><br><br>
+          <h1>ShillPoints&#8482; Counter</h1><br>
           <p>
+            Enter a Reddit username to check their karma on r/Superstonk from their last 1,000 posts and 1,000 comments.<br><br>
+            Takes about 15 seconds to crawl.<br><br>
+            Please reach out to <a href="mailto:fuckyouspez@thc-lab.net">THC-Lab</a> for questions or suggestions.<br><br>
+          </p>
 
-          Thanks for visiting THC's ShillPoints(tm) Counter! <br><br>
-          Enter the username you want to check.  It takes about 15 seconds to crawl the post history.  <br><br>
-          Data is based on the karma count from any activity on gme_meltdown in their last 1,000 posts / 1,000 comments.  <br><br><br>
-          Please reach out to <a href="mailto: fuckyouspez@thc-lab.net">THC-Lab</a> for any questions or suggestions.<br><br><br>
-</p>
-        <form action="/badape.html" method = "POST">
-            <p>Username: <input type = "text" name = "Name" /></p>
-            <p><input type = "submit" value = "Submit" onclick="(function(){alert('Checking, give it like...15 seconds.');})();" /></p>
+        <form action="/badape.html" method="POST">
+            <p>Username: <input type="text" name="Name" /></p>
+            <p><input type="submit" value="Submit" onclick="(function(){alert('Checking, give it like...15 seconds.');})();" /></p>
         </form>
 
-        <h1>
-            <font size="10">{{ response }}</font>
-        </h1>
+        {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+        {% endif %}
 
-        <br><br/><br/>
+        {% if response %}
+        <h1><font size="10">{{ response }}</font></h1>
+        <br><br>
+        <h2><font size="8">{{ meltPosts }}</font></h2>
+        <h2><font size="8">{{ meltComments }}</font></h2>
+        {% endif %}
 
-        <h2>
-            <font size="8">{{ meltPosts }}</font>
-        </h2>
-        <h2>
-            <font size="8">{{ meltComments }}</font>
-        </h2>
-
-        <br><br/><br/>
-        <div>
-            {{previous}}
-        </div>
       </div>
     </div>
   </div>
-
-          {% endblock %}
+{% endblock %}
