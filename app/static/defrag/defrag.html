@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Disk Defragmenter</title>
+<style>
+  :root {
+    --silver: #c0c0c0;
+    --navy: #000080;
+    --teal: #008080;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--teal);
+    font-family: Tahoma, "MS Sans Serif", Geneva, sans-serif;
+    font-size: 11px;
+    color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    cursor: default;
+    user-select: none;
+  }
+
+  /* ---- Win95 bevel helpers ---- */
+  .bevel-out {
+    background: var(--silver);
+    border: 1px solid;
+    border-color: #dfdfdf #404040 #404040 #dfdfdf;
+    box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #808080;
+  }
+  .bevel-in {
+    background: #fff;
+    border: 1px solid;
+    border-color: #404040 #dfdfdf #dfdfdf #404040;
+    box-shadow: inset 1px 1px 0 #808080, inset -1px -1px 0 #fff;
+  }
+
+  .window {
+    width: min(560px, 96vw);
+    padding: 3px;
+  }
+  .titlebar {
+    background: linear-gradient(90deg, var(--navy), #1084d0);
+    color: #fff;
+    font-weight: bold;
+    padding: 3px 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .titlebar .title { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tb-btn {
+    width: 16px; height: 14px;
+    font-family: Tahoma, sans-serif;
+    font-size: 10px; font-weight: bold;
+    line-height: 11px;
+    text-align: center;
+    color: #000;
+    padding: 0;
+  }
+  .tb-btn:active { border-color: #404040 #dfdfdf #dfdfdf #404040; box-shadow: inset 1px 1px 0 #808080; }
+
+  .body-area { padding: 10px; }
+
+  canvas#grid {
+    display: block;
+    width: 100%;
+    height: 220px;
+    background: #fff;
+  }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+    margin: 8px 2px;
+  }
+  .legend .item { display: flex; align-items: center; gap: 5px; }
+  .swatch { width: 10px; height: 10px; border: 1px solid #404040; display: inline-block; }
+
+  .status { margin: 8px 2px 4px 2px; min-height: 14px; }
+  .eta { margin: 0 2px 8px 2px; color: #222; min-height: 14px; }
+
+  .progress-outer { height: 18px; padding: 2px; }
+  .progress-inner { height: 100%; display: flex; gap: 2px; overflow: hidden; }
+  .progress-inner .seg { width: 9px; flex: none; background: var(--navy); }
+
+  .btn-row {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  button.w95 {
+    font-family: Tahoma, "MS Sans Serif", sans-serif;
+    font-size: 11px;
+    min-width: 78px;
+    padding: 4px 12px;
+    cursor: default;
+  }
+  button.w95:active { border-color: #404040 #dfdfdf #dfdfdf #404040; box-shadow: inset 1px 1px 0 #808080; }
+  button.w95:focus-visible { outline: 1px dotted #000; outline-offset: -4px; }
+
+  /* ---- dialogs ---- */
+  .dialog-veil {
+    position: fixed; inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+  }
+  .dialog-veil.open { display: flex; }
+  .dialog { width: min(340px, 90vw); padding: 3px; }
+  .dialog .body-area { display: flex; gap: 12px; align-items: flex-start; padding: 14px; }
+  .dlg-icon { font-size: 28px; line-height: 1; }
+  .dlg-text { flex: 1; padding-top: 4px; }
+  .dlg-btns { display: flex; justify-content: center; gap: 8px; padding: 0 14px 12px 14px; }
+
+  /* ---- screensaver ---- */
+  #saver {
+    position: fixed; inset: 0;
+    background: #000;
+    display: none;
+    z-index: 100;
+    cursor: none;
+  }
+  #saver.on { display: block; }
+  #saverCanvas { width: 100%; height: 100%; display: block; image-rendering: pixelated; }
+
+  #saverDialog { z-index: 200; cursor: default; }
+  #saverOk { position: relative; transition: transform 0.15s; }
+
+  @media (prefers-reduced-motion: reduce) {
+    /* the maze waits politely for those who asked it to */
+    #saver.on { display: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ THE DEFRAGMENTER ============ -->
+<div class="window bevel-out" id="mainWindow">
+  <div class="titlebar">
+    <span aria-hidden="true">🖴</span>
+    <span class="title">Defragmenting Drive C:</span>
+    <button class="tb-btn bevel-out" id="btnMin" aria-label="Minimize">_</button>
+    <button class="tb-btn bevel-out" id="btnMax" aria-label="Maximize">□</button>
+    <button class="tb-btn bevel-out" id="btnClose" aria-label="Close">×</button>
+  </div>
+  <div class="body-area">
+    <div class="bevel-in" style="padding:2px;">
+      <canvas id="grid"></canvas>
+    </div>
+
+    <div class="legend">
+      <span class="item"><span class="swatch" style="background:#000080;"></span>Fragmented data</span>
+      <span class="item"><span class="swatch" style="background:#00a8a8;"></span>Contiguous data</span>
+      <span class="item"><span class="swatch" style="background:#ffffff;"></span>Free space</span>
+      <span class="item"><span class="swatch" style="background:#ff0000;"></span>Data that resists</span>
+      <span class="item"><span class="swatch" style="background:#00ff00;"></span>Reading</span>
+    </div>
+
+    <div class="status" id="status">Defragmenting file system...</div>
+    <div class="eta" id="eta">Estimated time remaining: 3 minutes</div>
+
+    <div class="progress-outer bevel-in">
+      <div class="progress-inner" id="progressBar"></div>
+    </div>
+    <div style="text-align:center; margin-top:4px;" id="pct">0% Complete</div>
+
+    <div class="btn-row">
+      <button class="w95 bevel-out" id="btnStop">Stop</button>
+      <button class="w95 bevel-out" id="btnPause">Pause</button>
+      <button class="w95 bevel-out" id="btnDetails">Show Details</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ DIALOGS ============ -->
+<div class="dialog-veil" id="dlgStop">
+  <div class="dialog bevel-out">
+    <div class="titlebar"><span class="title">Disk Defragmenter</span></div>
+    <div class="body-area">
+      <div class="dlg-icon" aria-hidden="true">⚠️</div>
+      <div class="dlg-text">Are you sure you want to stop defragmenting Drive C:?<br><br>Stopping now may cause the drive to remain fragmented.</div>
+    </div>
+    <div class="dlg-btns">
+      <button class="w95 bevel-out" id="dlgStopYes">Yes</button>
+      <button class="w95 bevel-out" id="dlgStopNo">No</button>
+    </div>
+  </div>
+</div>
+
+<div class="dialog-veil" id="dlgClose">
+  <div class="dialog bevel-out">
+    <div class="titlebar"><span class="title">Disk Defragmenter</span></div>
+    <div class="body-area">
+      <div class="dlg-icon" aria-hidden="true">⛔</div>
+      <div class="dlg-text" id="dlgCloseText">Windows cannot stop the Disk Defragmenter because the Disk Defragmenter cannot be stopped.</div>
+    </div>
+    <div class="dlg-btns">
+      <button class="w95 bevel-out" id="dlgCloseOk">OK</button>
+    </div>
+  </div>
+</div>
+
+<div class="dialog-veil" id="dlgDetails">
+  <div class="dialog bevel-out">
+    <div class="titlebar"><span class="title">Details</span></div>
+    <div class="body-area">
+      <div class="dlg-icon" aria-hidden="true">ℹ️</div>
+      <div class="dlg-text">You are already looking at the details.</div>
+    </div>
+    <div class="dlg-btns">
+      <button class="w95 bevel-out" id="dlgDetailsOk">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- completion dialog -->
+<div class="dialog-veil" id="dlgDone">
+  <div class="dialog bevel-out">
+    <div class="titlebar"><span class="title">Disk Defragmenter</span></div>
+    <div class="body-area">
+      <div class="dlg-icon" aria-hidden="true">✅</div>
+      <div class="dlg-text">Defragmentation of Drive C: is complete.</div>
+    </div>
+    <div class="dlg-btns">
+      <button class="w95 bevel-out" id="dlgDoneOk">OK</button>
+    </div>
+  </div>
+</div>
+
+<div class="dialog-veil" id="dlgDone2">
+  <div class="dialog bevel-out">
+    <div class="titlebar"><span class="title">Disk Defragmenter</span></div>
+    <div class="body-area">
+      <div class="dlg-icon" aria-hidden="true">✅</div>
+      <div class="dlg-text">Drive C: has become fragmented.</div>
+    </div>
+    <div class="dlg-btns">
+      <button class="w95 bevel-out" id="dlgDoneOk2">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ THE SCREENSAVER ============ -->
+<div id="saver">
+  <canvas id="saverCanvas"></canvas>
+</div>
+
+<div class="dialog-veil" id="saverDialog">
+  <div class="dialog bevel-out">
+    <div class="titlebar"><span class="title">Screen Saver</span></div>
+    <div class="body-area">
+      <div class="dlg-icon" aria-hidden="true">⛔</div>
+      <div class="dlg-text">This screen saver cannot be closed.<br><br>You are in the maze now.</div>
+    </div>
+    <div class="dlg-btns">
+      <button class="w95 bevel-out" id="saverOk">OK</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* =============== DEFRAG SIMULATION =============== */
+  const canvas = document.getElementById('grid');
+  const ctx = canvas.getContext('2d');
+  const CELL = 8, GAP = 1;
+  let cols = 0, rows = 0, total = 0;
+  // states: 0 free, 1 fragmented, 2 contiguous, 3 bad
+  let cells = [];
+  let writePos = 0;
+  let usedCount = 0;
+  let paused = false;
+  let stopping = false;
+  let readFlash = [];
+  const startTime = Date.now();
+
+  function fragmentDrive() {
+    cells = new Array(total);
+    usedCount = 0;
+    for (let i = 0; i < total; i++) {
+      const r = Math.random();
+      if (r < 0.62) { cells[i] = 1; usedCount++; }
+      else if (r < 0.625) { cells[i] = 3; }
+      else cells[i] = 0;
+    }
+    writePos = 0;
+  }
+
+  function buildDrive() {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    canvas.width = Math.floor(rect.width - 4);
+    canvas.height = 220;
+    cols = Math.floor(canvas.width / (CELL + GAP));
+    rows = Math.floor(canvas.height / (CELL + GAP));
+    total = cols * rows;
+    fragmentDrive();
+  }
+
+  function colorOf(s) {
+    switch(s) {
+      case 0: return "#ffffff";
+      case 1: return "#000080";
+      case 2: return "#00a8a8";
+      case 3: return "#ff0000";
+    }
+  }
+
+  function draw() {
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    for (let i = 0; i < total; i++) {
+      const x = (i % cols) * (CELL + GAP);
+      const y = Math.floor(i / cols) * (CELL + GAP);
+      ctx.fillStyle = colorOf(cells[i]);
+      ctx.fillRect(x, y, CELL, CELL);
+    }
+    const now = Date.now();
+    readFlash = readFlash.filter(f => now - f.t < 400);
+    ctx.fillStyle = "#00ff00";
+    for (const f of readFlash) {
+      const x = (f.i % cols) * (CELL + GAP);
+      const y = Math.floor(f.i / cols) * (CELL + GAP);
+      ctx.fillRect(x, y, CELL, CELL);
+    }
+  }
+
+let completing = false;
+
+
+function complete() {
+  if (completing) return;
+  completing = true;
+  setStatus("Finalizing...");
+  
+  setTimeout(() => {
+    if (saverOn) {
+      // nobody is watching. fragment quietly and carry on.
+      fragmentDrive();
+      setStatus("Defragmenting file system...");
+      completing = false;
+    } else {
+      openDlg('dlgDone');
+      beep(880, 0.12); 
+      setTimeout(() => beep(1175, 0.18), 130);    
+    }
+  }, 1500);
+}
+
+// Event listeners should be bound outside the complete() function 
+// (e.g., during app initialization) so they don't attach multiple duplicates on every run:
+
+document.getElementById('dlgDoneOk').addEventListener('click', () => {
+  closeDlg('dlgDone');
+  openDlg('dlgDone2');        
+  beep(880, 0.12); 
+  setTimeout(() => beep(1175, 0.18), 130);   
+});
+
+document.getElementById('dlgDoneOk2').addEventListener('click', () => {
+  closeDlg('dlgDone2');
+  fragmentDrive();
+  setStatus("Defragmenting file system...");
+  completing = false; 
+  // Note: ensure this completes whatever async drive fragmentation 
+  // is happening so the user can run `complete()` again later if needed.
+});
+
+  // one defrag step: find a fragmented cluster, flash it, move it to writePos
+  function step() {
+    if (paused || stopping || completing) return;
+    while (writePos < total && (cells[writePos] === 2 || cells[writePos] === 3)) writePos++;
+    if (writePos >= total) { complete(); return; }
+    let src = -1;
+    if (cells[writePos] === 1) {
+      src = writePos;
+    } else {
+      for (let tries = 0; tries < 40; tries++) {
+        const k = writePos + 1 + Math.floor(Math.random() * (total - writePos - 1));
+        if (cells[k] === 1) { src = k; break; }
+      }
+      if (src === -1) {
+        for (let k = writePos + 1; k < total; k++) if (cells[k] === 1) { src = k; break; }
+      }
+    }
+    if (src === -1) { complete(); return; }
+    readFlash.push({ i: src, t: Date.now() });
+    cells[src] = 0;
+    cells[writePos] = 2;
+    writePos++;
+    tick();
+  }
+
+  function progress() {
+    let done = 0;
+    for (let i = 0; i < writePos && i < total; i++) if (cells[i] === 2) done++;
+    return usedCount ? Math.min(0.999, done / usedCount) : 0;
+  }
+
+  /* =============== UI: progress / status / ETA =============== */
+  const statusEl = document.getElementById('status');
+  const etaEl = document.getElementById('eta');
+  const pctEl = document.getElementById('pct');
+  const barEl = document.getElementById('progressBar');
+  let segCount = 0;
+
+  function setStatus(s) { statusEl.textContent = s; }
+
+  const idleStatuses = [
+    "Defragmenting file system...",
+    "Moving cluster 48,151 of [unknowable]...",
+    "Consolidating free space...",
+    "Optimizing the concept of files...",
+    "Reading FAT... the FAT is fine, thanks for asking",
+    "Defragmenting file system...",
+    "Relocating C:\\WINDOWS\\TEMP\\~$~$~$~$.TMP...",
+    "Compacting... something...",
+    "Defragmenting file system...",
+    "Negotiating with sector 7..."
+  ];
+  let statusIdx = 0;
+  setInterval(() => {
+    if (paused || stopping || completing) return;
+    statusIdx = (statusIdx + 1) % idleStatuses.length;
+    setStatus(idleStatuses[statusIdx]);
+  }, 9000);
+
+  function fmtEta() {
+    const elapsed = (Date.now() - startTime) / 1000;
+    const mins = 3 + elapsed * 0.04 * (1 + elapsed / 300);
+    if (mins < 60) return Math.floor(mins) + " minutes";
+    const hrs = mins / 60;
+    if (hrs < 48) return Math.floor(hrs) + " hours";
+    const days = hrs / 24;
+    if (days < 3650) return Math.floor(days) + " days";
+    return "unknown";
+  }
+
+  function refreshUI() {
+    const p = progress();
+    pctEl.textContent = Math.floor(p * 100) + "% Complete";
+    const want = Math.floor((barEl.clientWidth / 11) * p);
+    while (segCount < want) { const d = document.createElement('div'); d.className = 'seg'; barEl.appendChild(d); segCount++; }
+    while (segCount > want) { barEl.removeChild(barEl.lastChild); segCount--; }
+    etaEl.textContent = "Estimated time remaining: " + fmtEta() + (paused ? " (paused, still increasing)" : "");
+  }
+
+  /* =============== SOUND: hdd seek ticks + beeps (after first click) =============== */
+  let audioCtx = null, soundArmed = false;
+  document.addEventListener('pointerdown', () => { soundArmed = true; }, { once: true });
+  function beep(freq, dur, vol) {
+    if (!soundArmed) return;
+    try {
+      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.type = "square";
+      o.frequency.value = freq;
+      g.gain.setValueAtTime(vol || 0.04, audioCtx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur);
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start(); o.stop(audioCtx.currentTime + dur);
+    } catch (e) {}
+  }
+  function tick() {
+    if (Math.random() > 0.25) return;
+    beep(1800 + Math.random() * 2400, 0.02, 0.012);
+  }
+
+  /* =============== BUTTONS & DIALOGS =============== */
+  function openDlg(id) { document.getElementById(id).classList.add('open'); }
+  function closeDlg(id) { document.getElementById(id).classList.remove('open'); }
+
+  document.getElementById('btnPause').addEventListener('click', function() {
+    paused = !paused;
+    this.textContent = paused ? "Resume" : "Pause";
+    if (paused) { setStatus("Paused. The fragmentation continues regardless."); }
+    else { setStatus("Resuming..."); }
+  });
+
+  document.getElementById('btnStop').addEventListener('click', () => openDlg('dlgStop'));
+  document.getElementById('dlgStopNo').addEventListener('click', () => closeDlg('dlgStop'));
+  document.getElementById('dlgStopYes').addEventListener('click', () => {
+    closeDlg('dlgStop');
+    stopping = true;
+    setStatus("Stopping...");
+    setTimeout(() => {
+      setStatus("Stop request could not be completed. Restarting defragmentation of Drive C:...");
+      stopping = false;
+    }, 3500);
+  });
+
+  let closeAttempts = 0;
+  const closeLines = [
+    "Windows cannot stop the Disk Defragmenter because the Disk Defragmenter cannot be stopped.",
+    "The Disk Defragmenter has considered your request and declined.",
+    "Error 0x0000000: There is no error. The defragmentation simply continues.",
+    "The window cannot be closed while the drive is fragmented. The drive will always be fragmented."
+  ];
+  document.getElementById('btnClose').addEventListener('click', () => {
+    document.getElementById('dlgCloseText').textContent = closeLines[Math.min(closeAttempts, closeLines.length - 1)];
+    closeAttempts++;
+    openDlg('dlgClose');
+  });
+  document.getElementById('btnMin').addEventListener('click', () => {
+    document.getElementById('dlgCloseText').textContent = "The Disk Defragmenter prefers to be seen.";
+    openDlg('dlgClose');
+  });
+  document.getElementById('btnMax').addEventListener('click', () => {
+    document.getElementById('dlgCloseText').textContent = "The Disk Defragmenter is already as large as it needs to be.";
+    openDlg('dlgClose');
+  });
+  document.getElementById('dlgCloseOk').addEventListener('click', () => closeDlg('dlgClose'));
+
+  document.getElementById('btnDetails').addEventListener('click', () => openDlg('dlgDetails'));
+  document.getElementById('dlgDetailsOk').addEventListener('click', () => closeDlg('dlgDetails'));
+
+  /* =============== THE 3D MAZE SCREENSAVER =============== */
+  const saver = document.getElementById('saver');
+  const sCanvas = document.getElementById('saverCanvas');
+  const sCtx = sCanvas.getContext('2d');
+  let saverOn = false;
+  let idleTimer = null;
+  let okDodged = false;
+  const IDLE_MS = 7500000;
+
+  // low-res internal buffer for chunky authentic pixels
+  const RW = 320, RH = 200;
+  const buf = document.createElement('canvas');
+  buf.width = RW; buf.height = RH;
+  const bctx = buf.getContext('2d');
+
+  // ---- brick texture (procedural, 64x64) ----
+  const TEX = 64;
+  function makeBrickTexture(dark) {
+    const t = document.createElement('canvas');
+    t.width = TEX; t.height = TEX;
+    const c = t.getContext('2d');
+    const mul = dark ? 0.62 : 1;
+    function col(r,g,b){ return "rgb(" + Math.floor(r*mul) + "," + Math.floor(g*mul) + "," + Math.floor(b*mul) + ")"; }
+    c.fillStyle = col(146, 50, 36);
+    c.fillRect(0, 0, TEX, TEX);
+    // brick variation
+    for (let by = 0; by < 4; by++) {
+      for (let bx = 0; bx < 4; bx++) {
+        const shade = 0.88 + ((bx * 7 + by * 13) % 5) * 0.05;
+        c.fillStyle = col(146*shade, 50*shade, 36*shade);
+        const off = (by % 2) ? TEX/8 : 0;
+        c.fillRect((bx*TEX/4 + off) % TEX, by*TEX/4, TEX/4, TEX/4);
+        if (off && bx === 3) c.fillRect(-TEX/8 + TEX/8, by*TEX/4, 0, 0);
+      }
+    }
+    // mortar
+    c.fillStyle = col(178, 158, 134);
+    for (let y = 0; y <= TEX; y += TEX/4) c.fillRect(0, y - 1, TEX, 2);
+    for (let by = 0; by < 4; by++) {
+      const off = (by % 2) ? TEX/8 : 0;
+      for (let x = off; x <= TEX; x += TEX/4) c.fillRect(x - 1, by*TEX/4, 2, TEX/4);
+    }
+    return t;
+  }
+  const texLight = makeBrickTexture(false);
+  const texDark = makeBrickTexture(true);
+
+  // ---- maze generation (recursive backtracker on odd grid) ----
+  let MW = 17, MH = 17;
+  let maze = [];
+  function genMaze() {
+    maze = [];
+    for (let y = 0; y < MH; y++) maze.push(new Array(MW).fill(1));
+    const stack = [[1,1]];
+    maze[1][1] = 0;
+    while (stack.length) {
+      const [cx, cy] = stack[stack.length-1];
+      const dirs = [[2,0],[-2,0],[0,2],[0,-2]].sort(() => Math.random() - 0.5);
+      let carved = false;
+      for (const [dx,dy] of dirs) {
+        const nx = cx+dx, ny = cy+dy;
+        if (nx > 0 && ny > 0 && nx < MW-1 && ny < MH-1 && maze[ny][nx] === 1) {
+          maze[ny][nx] = 0;
+          maze[cy+dy/2][cx+dx/2] = 0;
+          stack.push([nx,ny]);
+          carved = true;
+          break;
+        }
+      }
+      if (!carved) stack.pop();
+    }
+    // braid the maze: knock the back wall out of ~90% of dead ends so the
+    // wanderer roams loops instead of ping-ponging in and out of cul-de-sacs
+    const D4 = [[1,0],[-1,0],[0,1],[0,-1]];
+    for (let y = 1; y < MH; y += 2) {
+      for (let x = 1; x < MW; x += 2) {
+        const open = D4.filter(([dx,dy]) => maze[y+dy][x+dx] === 0);
+        if (open.length !== 1 || Math.random() > 0.9) continue;
+        const sealed = D4.filter(([dx,dy]) =>
+          maze[y+dy][x+dx] === 1 &&
+          x + dx*2 >= 1 && x + dx*2 <= MW-2 &&
+          y + dy*2 >= 1 && y + dy*2 <= MH-2
+        );
+        if (sealed.length) {
+          const [dx,dy] = sealed[Math.floor(Math.random()*sealed.length)];
+          maze[y+dy][x+dx] = 0;
+        }
+      }
+    }
+  }
+  function isOpen(x, y) {
+    return x >= 0 && y >= 0 && x < MW && y < MH && maze[y][x] === 0;
+  }
+
+  // ---- the wanderer (left-hand rule, smooth turns) ----
+  const DIRS = [[1,0],[0,1],[-1,0],[0,-1]]; // E S W N
+  let px = 1.5, py = 1.5;       // position (cell units)
+  let dirIdx = 0;               // facing
+  let ang = 0;                  // current render angle (rad)
+  let targetAng = 0;
+  let mode = "decide";          // decide | turn | walk
+  let tx = 1.5, ty = 1.5;       // walk target
+  let walkSpeed = 1.4;          // cells/sec
+  const TURN_SPEED = Math.PI;   // rad/sec
+  let roll = 0, rollState = 0, rollT = 0; // the smiley flip
+
+  function decide() {
+    const cx = Math.floor(px), cy = Math.floor(py);
+    const back = (dirIdx + 2) % 4;
+    const can = i => isOpen(cx + DIRS[i][0], cy + DIRS[i][1]);
+    // weighted random: prefer straight ahead, never reverse unless trapped
+    const options = [];
+    for (let i = 0; i < 4; i++) {
+      if (i === back || !can(i)) continue;
+      const w = (i === dirIdx) ? 3 : 2;
+      for (let k = 0; k < w; k++) options.push(i);
+    }
+    const next = options.length ? options[Math.floor(Math.random()*options.length)] : back;
+    if (next !== dirIdx) {
+      // shortest rotation
+      let d = next - dirIdx;
+      if (d > 2) d -= 4;
+      if (d < -2) d += 4;
+      targetAng = ang + d * Math.PI / 2;
+      dirIdx = next;
+      mode = "turn";
+    } else {
+      tx = cx + 0.5 + DIRS[dirIdx][0];
+      ty = cy + 0.5 + DIRS[dirIdx][1];
+      mode = "walk";
+    }
+  }
+
+  function updateWanderer(dt) {
+    // smiley flip timing
+    if (rollState === 0 && Math.random() < dt / 25) { rollState = 1; rollT = 0; }
+    if (rollState === 1) { rollT += dt; roll = Math.min(1, rollT / 0.7) * Math.PI; if (rollT >= 0.7) { rollState = 2; rollT = 0; } }
+    else if (rollState === 2) { roll = Math.PI; rollT += dt; if (rollT > 4) { rollState = 3; rollT = 0; } }
+    else if (rollState === 3) { rollT += dt; roll = Math.PI * (1 - Math.min(1, rollT / 0.7)); if (rollT >= 0.7) { rollState = 0; roll = 0; } }
+
+    if (mode === "decide") decide();
+    else if (mode === "turn") {
+      const d = targetAng - ang;
+      const stepA = TURN_SPEED * dt;
+      if (Math.abs(d) <= stepA) { ang = targetAng; mode = "decide"; }
+      else ang += Math.sign(d) * stepA;
+    } else if (mode === "walk") {
+      const dx = tx - px, dy = ty - py;
+      const dist = Math.hypot(dx, dy);
+      const stepD = walkSpeed * dt;
+      if (dist <= stepD) { px = tx; py = ty; mode = "decide"; }
+      else { px += dx / dist * stepD; py += dy / dist * stepD; }
+    }
+    // walk speed decays back to normal if the mouse stirred it up
+    walkSpeed += (1.4 - walkSpeed) * dt * 0.4;
+  }
+
+  // ---- raycaster ----
+  function castAndRender() {
+    // ceiling & floor
+    const grad1 = bctx.createLinearGradient(0, 0, 0, RH/2);
+    grad1.addColorStop(0, "#6a6a72"); grad1.addColorStop(1, "#3c3c42");
+    bctx.fillStyle = grad1;
+    bctx.fillRect(0, 0, RW, RH/2);
+    const grad2 = bctx.createLinearGradient(0, RH/2, 0, RH);
+    grad2.addColorStop(0, "#2a2a2e"); grad2.addColorStop(1, "#4a4a50");
+    bctx.fillStyle = grad2;
+    bctx.fillRect(0, RH/2, RW, RH/2);
+
+    const FOV = Math.PI / 3;
+    const dirX = Math.cos(ang), dirY = Math.sin(ang);
+    const planeX = -dirY * Math.tan(FOV/2), planeY = dirX * Math.tan(FOV/2);
+
+    for (let x = 0; x < RW; x++) {
+      const camX = 2 * x / RW - 1;
+      const rdX = dirX + planeX * camX;
+      const rdY = dirY + planeY * camX;
+      let mapX = Math.floor(px), mapY = Math.floor(py);
+      const dX = Math.abs(1 / (rdX || 1e-9)), dY = Math.abs(1 / (rdY || 1e-9));
+      let stepX, stepY, sideX, sideY;
+      if (rdX < 0) { stepX = -1; sideX = (px - mapX) * dX; } else { stepX = 1; sideX = (mapX + 1 - px) * dX; }
+      if (rdY < 0) { stepY = -1; sideY = (py - mapY) * dY; } else { stepY = 1; sideY = (mapY + 1 - py) * dY; }
+      let side = 0, hit = false, guard = 0;
+      while (!hit && guard++ < 64) {
+        if (sideX < sideY) { sideX += dX; mapX += stepX; side = 0; }
+        else { sideY += dY; mapY += stepY; side = 1; }
+        if (mapX < 0 || mapY < 0 || mapX >= MW || mapY >= MH || maze[mapY][mapX] === 1) hit = true;
+      }
+      const perpDist = side === 0 ? (sideX - dX) : (sideY - dY);
+      const h = Math.min(RH * 4, Math.floor(RH / Math.max(perpDist, 0.05)));
+      const drawStart = Math.floor((RH - h) / 2);
+      // texture column
+      let wallX = side === 0 ? py + perpDist * rdY : px + perpDist * rdX;
+      wallX -= Math.floor(wallX);
+      const texX = Math.floor(wallX * TEX) & (TEX - 1);
+      bctx.drawImage(side === 1 ? texDark : texLight, texX, 0, 1, TEX, x, drawStart, 1, h);
+      // distance fog
+      const fog = Math.min(0.75, perpDist / 14);
+      if (fog > 0.03) {
+        bctx.fillStyle = "rgba(0,0,0," + fog.toFixed(2) + ")";
+        bctx.fillRect(x, Math.max(0, drawStart), 1, Math.min(h, RH));
+      }
+    }
+  }
+
+  let lastFrame = 0;
+  function saverLoop(ts) {
+    if (!saverOn) return;
+    const dt = Math.min(0.05, (ts - lastFrame) / 1000 || 0.016);
+    lastFrame = ts;
+    updateWanderer(dt);
+    castAndRender();
+    // blit to fullscreen with chunky pixels (and the smiley roll, when it strikes)
+    sCtx.imageSmoothingEnabled = false;
+    sCtx.fillStyle = "#000";
+    sCtx.fillRect(0, 0, sCanvas.width, sCanvas.height);
+    sCtx.save();
+    sCtx.translate(sCanvas.width / 2, sCanvas.height / 2);
+    sCtx.rotate(roll);
+    sCtx.drawImage(buf, -sCanvas.width / 2, -sCanvas.height / 2, sCanvas.width, sCanvas.height);
+    sCtx.restore();
+    requestAnimationFrame(saverLoop);
+  }
+
+  function resetIdle() {
+    clearTimeout(idleTimer);
+    if (!saverOn) idleTimer = setTimeout(startSaver, IDLE_MS);
+  }
+  ['pointermove','pointerdown','keydown','touchstart'].forEach(ev =>
+    document.addEventListener(ev, () => { if (!saverOn) resetIdle(); }, { passive: true })
+  );
+
+  function startSaver() {
+    saverOn = true;
+    genMaze();
+    px = 1.5; py = 1.5; dirIdx = 0; ang = 0; targetAng = 0; mode = "decide";
+    roll = 0; rollState = 0;
+    sCanvas.width = window.innerWidth;
+    sCanvas.height = window.innerHeight;
+    saver.classList.add('on');
+    lastFrame = 0;
+    requestAnimationFrame(saverLoop);
+  }
+  function endSaver() {
+    saverOn = false;
+    okDodged = false;
+    saver.classList.remove('on');
+    closeDlg('saverDialog');
+    resetIdle();
+  }
+
+  // moving the mouse does not dismiss the maze. it makes the maze walk faster.
+  let lastStir = 0;
+  saver.addEventListener('pointermove', () => {
+    const now = Date.now();
+    if (now - lastStir > 250) {
+      lastStir = now;
+      walkSpeed = Math.min(6, walkSpeed + 0.5);
+    }
+  });
+  saver.addEventListener('pointerdown', () => openDlg('saverDialog'));
+  document.addEventListener('keydown', () => { if (saverOn) openDlg('saverDialog'); });
+
+  // the OK button flees once, then relents
+  const okBtn = document.getElementById('saverOk');
+  okBtn.addEventListener('pointerenter', () => {
+    if (!okDodged) {
+      okDodged = true;
+      okBtn.style.transform = "translate(" + (40 + Math.random() * 60) + "px, " + (Math.random() < 0.5 ? -1 : 1) * 30 + "px)";
+      setTimeout(() => { okBtn.style.transform = ""; }, 900);
+    }
+  });
+  okBtn.addEventListener('click', endSaver);
+
+  /* =============== MAIN LOOP =============== */
+  buildDrive();
+  resetIdle();
+  setInterval(step, 200);          // one cluster every 200ms — the slow grind
+  setInterval(refreshUI, 500);
+  (function render() { draw(); requestAnimationFrame(render); })();
+  window.addEventListener('resize', () => {
+    buildDrive();
+    if (saverOn) { sCanvas.width = window.innerWidth; sCanvas.height = window.innerHeight; }
+  });
+})();
+</script>
+</body>
+</html>
