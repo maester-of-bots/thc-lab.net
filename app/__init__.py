@@ -7,7 +7,7 @@ def create_app(config):
     app.config.from_object(config)
 
     modules = ['art', 'home', 'shorts', 'password_gen', 'BOFH', 'dnsmh', 'badape', 'github',
-               'subnet_calculator', 'phonenumbers', 'emailsmh']
+               'subnet_calculator', 'emailsmh']
 
     with app.app_context():
 
